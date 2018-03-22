@@ -66,7 +66,7 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/oscarmherrera/azure_postgres/",
+    "templateBaseUrl": "https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/",
     "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
     "tshirtSizeSmall": {
       "vmSize": "Standard_A1",
