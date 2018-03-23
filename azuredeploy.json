@@ -149,9 +149,9 @@
         "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/shared_scripts/ubuntu/vm-disk-utils-0.1.sh"
       ],
       "imageReference": {
-        "publisher": "credativ",
-        "offer": "Debian",
-        "sku": "8",
+        "publisher": "Canonical",
+        "offer": "UbuntuServer",
+        "sku": "14.04.2-LTS",
         "version": "latest"
       }
     },
