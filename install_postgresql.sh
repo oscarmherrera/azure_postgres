@@ -92,7 +92,9 @@ logger "NOW=$now MASTERIP=$MASTERIP SUBNETADDRESS=$SUBNETADDRESS NODETYPE=$NODET
 install_postgresql_service() {
 	logger "Start installing PostgreSQL..."
 	# Re-synchronize the package index files from their sources. An update should always be performed before an upgrade.
-	apt-get -y update
+	logger "Start Update of Packages..."
+	apt-get -o Acquire::ForceIPv4=true -y update
+	logger "Finished Update of Packages..."
 
 	# Install PostgreSQL if it is not yet installed
 	if [ $(dpkg-query -W -f='${Status}' postgresql 2>/dev/null | grep -c "ok installed") -eq 0 ];
