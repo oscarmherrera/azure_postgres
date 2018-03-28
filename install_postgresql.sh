@@ -93,7 +93,7 @@ install_postgresql_service() {
 	logger "Start installing PostgreSQL..."
 	# Re-synchronize the package index files from their sources. An update should always be performed before an upgrade.
 	logger "Start Update of Packages..."
-	apt-get -o Acquire::ForceIPv4=true -y update
+	# apt-get -o Acquire::ForceIPv4=true -y update
 	logger "Finished Update of Packages..."
 
 	# Install PostgreSQL if it is not yet installed
