@@ -96,12 +96,13 @@ install_postgresql_service() {
 	# apt-get -o Acquire::ForceIPv4=true -y update
 	logger "Finished Update of Packages..."
 
+# "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main"
 	# Install PostgreSQL if it is not yet installed
 	if [ $(dpkg-query -W -f='${Status}' postgresql 2>/dev/null | grep -c "ok installed") -eq 0 ];
 	then
-		add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main"
+		add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main 
 		wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-	  	apt-get -y install postgresql-9.6* postgresql-contrib-9.6* postgresql-client-9.6*
+	  	apt-get -y install postgresql-9.6 postgresql-contrib-9.6 postgresql-client-9.6
 	fi
 	
 	logger "Done installing PostgreSQL..."
