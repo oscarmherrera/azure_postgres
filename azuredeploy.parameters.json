@@ -20,7 +20,7 @@
     "jumpbox": {
       "value": "Enabled"
     },
-    "HA": {
+    "haEnabled": {
       "value": "Disabled"
     }
   }

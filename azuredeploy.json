@@ -53,6 +53,13 @@
         "Enabled",
         "Disabled"
       ],
+    "haEnabled": {
+      "type": "string",
+      "defaultValue": "Disabled",
+      "allowedValues": [
+        "Enabled",
+        "Disabled"
+      ],
       "metadata": {
         "description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the PostgreSQL environment"
       }
@@ -145,7 +152,7 @@
     "jumpboxTemplateEnabled": "jumpbox-resources.json",
     "jumpboxTemplateDisabled": "empty-resources.json",
     "jumpboxTemplateUrl": "[concat(variables('templateBaseUrl'), variables(concat('jumpboxTemplate',parameters('jumpbox'))))]",
-    "HATemplateUrl": "[concat(variables('templateBaseUrl'), variables(concat('HATemplate',parameters('HA'))))]",
+    "HATemplateUrl": "[concat(variables('templateBaseUrl'), variables(concat('HATemplate',parameters('haEnabled'))))]",
     "osSettings": {
       "scripts": [
         "[concat(variables('templateBaseUrl'), 'install_postgresql.sh')]",
