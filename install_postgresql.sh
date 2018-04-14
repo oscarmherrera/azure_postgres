@@ -87,7 +87,7 @@ done
 
 export PGPASSWORD=$REPLICATORPASSWORD
 
-logger \"NOW=$now MASTERIP=$MASTERIP SUBNETADDRESS=$SUBNETADDRESS NODETYPE=$NODETYPE\"
+logger \" NOW=$now MASTERIP=$MASTERIP SUBNETADDRESS=$SUBNETADDRESS NODETYPE={$NODETYPE} \"
 
 install_postgresql_service() {
 	logger \"Start installing PostgreSQL...\"
@@ -208,7 +208,7 @@ configure_streaming_replication() {
 		sudo -u postgres echo \"trigger_file = '/var/lib/postgresql/9.6/main/failover'\" >> recovery.conf
 	fi
 	
-	logger \\"Done configuring PostgreSQL streaming replication\\\"
+	logger \"Done configuring PostgreSQL streaming replication\"
 }
 
 # MAIN ROUTINE
