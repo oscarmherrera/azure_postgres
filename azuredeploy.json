@@ -93,7 +93,8 @@
           0,
           0
         ],
-        "jumpbox": 0
+        "jumpbox": 0,
+        "consul": 0
       }
     },
     "tshirtSizeMedium": {
@@ -110,7 +111,8 @@
           0,
           1
         ],
-        "jumpbox": 0
+        "jumpbox": 0,
+        "consul": 0
       }
     },
     "tshirtSizeLarge": {
@@ -128,7 +130,8 @@
           1,
           1
         ],
-        "jumpbox": 0
+        "jumpbox": 0,
+        "consul": 0
       }
     },
     "tshirtSizeXLarge": {
@@ -147,7 +150,8 @@
           1,
           1
         ],
-        "jumpbox": 0
+        "jumpbox": 0,
+        "consul": 0
       }
     },
     "tshirtSize": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
