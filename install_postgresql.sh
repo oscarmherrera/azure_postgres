@@ -24,7 +24,7 @@
 #
 #
 # Author: Full Scale 180 Inc.
-
+set -x
 # You must be root to run this script
 if [ "${UID}" -ne 0 ];
 then
@@ -222,3 +222,4 @@ configure_streaming_replication
 
 service postgresql start
 
+set +x
