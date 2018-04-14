@@ -53,7 +53,11 @@
         "Enabled",
         "Disabled"
       ],
-    "haEnabled": {
+      "metadata": {
+        "description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the PostgreSQL environment"
+      }
+    },
+    "haConfigured": {
       "type": "string",
       "defaultValue": "Disabled",
       "allowedValues": [
@@ -61,7 +65,7 @@
         "Disabled"
       ],
       "metadata": {
-        "description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the PostgreSQL environment"
+        "description": "The flag allowing to enable or disable provisioning of the consul VM that can be used to access the PostgreSQL environment"
       }
     },
     "virtualNetworkName": {
@@ -152,7 +156,7 @@
     "jumpboxTemplateEnabled": "jumpbox-resources.json",
     "jumpboxTemplateDisabled": "empty-resources.json",
     "jumpboxTemplateUrl": "[concat(variables('templateBaseUrl'), variables(concat('jumpboxTemplate',parameters('jumpbox'))))]",
-    "HATemplateUrl": "[concat(variables('templateBaseUrl'), variables(concat('HATemplate',parameters('haEnabled'))))]",
+    "HATemplateUrl": "[concat(variables('templateBaseUrl'), variables(concat('HATemplate',parameters('haConfigured'))))]",
     "osSettings": {
       "scripts": [
         "[concat(variables('templateBaseUrl'), 'install_postgresql.sh')]",
@@ -330,7 +334,7 @@
         "parameters": {
           "storageSettings": {
             "value": {
-              "name": "[concat(parameters('storageAccountNamePrefix'), variables('tshirtSize').storage.jumpbox)]"
+              "name": "[concat(parameters('storageAccountNamePrefix'), variables('tshirtSize').storage.consul)]"
             }
           },
           "dnsName": {
@@ -339,7 +343,7 @@
           "commonSettings": {
             "value": {
               "adminUsername": "[parameters('adminUsername')]",
-              "namespace": "jumpbox"
+              "namespace": "consul"
             }
           },
           "adminPassword": {
@@ -354,8 +358,6 @@
         }
       }
     },
-
-
     {
       "name": "jumpbox",
       "type": "Microsoft.Resources/deployments",
