@@ -8,6 +8,9 @@
     "availabilitySetSettings": {
       "type": "object"
     },
+    "etcdAvailabilitySetSettings": {
+      "type": "object"
+    },    
     "networkSettings": {
       "type": "object"
     }
@@ -62,6 +65,16 @@
       "properties": {
         "platformFaultDomainCount": "[parameters('availabilitySetSettings').fdCount]",
         "platformUpdateDomainCount": "[parameters('availabilitySetSettings').udCount]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/etcdAvailabilitySets",
+      "name": "[parameters('etcdAvailabilitySetSettings').name]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "platformFaultDomainCount": "[parameters('etcdAvailabilitySetSettings').fdCount]",
+        "platformUpdateDomainCount": "[parameters('etcdAvailabilitySetSettings').udCount]"
       }
     }
   ],
