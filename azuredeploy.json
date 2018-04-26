@@ -79,6 +79,23 @@
   "variables": {
     "templateBaseUrl": "https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/",
     "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
+    "etcdVMSmall": {
+      "vmSize": "Standard_A1",
+      "diskSize": 1023,
+      "vmTemplate": "[concat(variables('templateBaseUrl'), 'database-2disk-resources.json')]",
+      "vmCount": 2,
+      "slaveCount": 1,
+      "storage": {
+        "name": "[parameters('storageAccountNamePrefix')]",
+        "count": 1,
+        "pool": "db",
+        "map": [
+          0,
+          0
+        ],
+        "jumpbox": 0
+      }
+    },
     "tshirtSizeSmall": {
       "vmSize": "Standard_A1",
       "diskSize": 1023,
@@ -93,8 +110,7 @@
           0,
           0
         ],
-        "jumpbox": 0,
-        "consul": 0
+        "jumpbox": 0
       }
     },
     "tshirtSizeMedium": {
@@ -111,8 +127,7 @@
           0,
           1
         ],
-        "jumpbox": 0,
-        "consul": 0
+        "jumpbox": 0
       }
     },
     "tshirtSizeLarge": {
@@ -130,8 +145,7 @@
           1,
           1
         ],
-        "jumpbox": 0,
-        "consul": 0
+        "jumpbox": 0
       }
     },
     "tshirtSizeXLarge": {
@@ -150,8 +164,7 @@
           1,
           1
         ],
-        "jumpbox": 0,
-        "consul": 0
+        "jumpbox": 0
       }
     },
     "tshirtSize": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
@@ -193,6 +206,11 @@
       "name": "pgsqlAvailabilitySet",
       "fdCount": 3,
       "udCount": 5
+    },
+    "etcdAvailabilitySetSettings": {
+      "name": "etcdAvailabilitySet",
+      "fdCount": 2,
+      "udCount": 2
     }
   },
   "resources": [
@@ -215,6 +233,9 @@
           },
           "availabilitySetSettings": {
             "value": "[variables('availabilitySetSettings')]"
+          },
+          "etcdAvailabilitySetSettings": {
+            "value": "[variables('etcdAvailabilitySetSettings')]"
           }
         }
       }
@@ -324,40 +345,44 @@
       }
     },
     {
-      "name": "consul",
+      "name": "etcd-node",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'shared')]"
       ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('HATemplateUrl')]",
+          "uri": "[variables('etcdVMSmall').vmTemplate]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "storageSettings": {
-            "value": {
-              "name": "[concat(parameters('storageAccountNamePrefix'), variables('tshirtSize').storage.consul)]"
-            }
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
           },
-          "dnsName": {
-            "value": "[parameters('domainName')]"
+          "osSettings": {
+            "value": "[variables('osSettings')]"
+          },
+          "subnet": {
+            "value": "[variables('networkSettings').subnets.data]"
           },
           "commonSettings": {
             "value": {
               "adminUsername": "[parameters('adminUsername')]",
-              "namespace": "consul"
+              "namespace": "etcd"
             }
           },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
+          "storageSettings": {
+            "value": "[variables('etcdVMSmall').storage]"
           },
-          "subnet": {
-            "value": "[variables('networkSettings').subnets.dmz]"
-          },
-          "osSettings": {
-            "value": "[variables('osSettings')]"
+          "machineSettings": {
+            "value": {
+              "vmSize": "[variables('etcdVMSmall').vmSize]",
+              "diskSize": "[variables('etcdVMSmall').diskSize]",
+              "vmCount": "[variables('etcdVMSmall').vmCount]",
+              "availabilitySet": "[variables('etcdAvailabilitySetSettings').name]"
+            }
           }
         }
       }
