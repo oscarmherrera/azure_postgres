@@ -233,6 +233,9 @@
           },
           "availabilitySetSettings": {
             "value": "[variables('availabilitySetSettings')]"
+          },
+          "etcdAvailabilitySetSettings": {
+            "value": "[variables('etcdAvailabilitySetSettings')]"
           }
         }
       }
@@ -341,7 +344,6 @@
         }
       }
     },
-
     {
       "name": "etcd-node",
       "type": "Microsoft.Resources/deployments",
@@ -368,7 +370,7 @@
           "commonSettings": {
             "value": {
               "adminUsername": "[parameters('adminUsername')]",
-              "namespace": "sl"
+              "namespace": "etcd"
             }
           },
           "storageSettings": {
@@ -385,8 +387,6 @@
         }
       }
     },
-
-
     {
       "name": "jumpbox",
       "type": "Microsoft.Resources/deployments",
