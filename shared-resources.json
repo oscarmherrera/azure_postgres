@@ -68,7 +68,7 @@
       }
     },
     {
-      "type": "Microsoft.Compute/AvailabilitySets",
+      "type": "Microsoft.Compute/availabilitySets",
       "name": "[parameters('etcdAvailabilitySetSettings').name]",
       "apiVersion": "2015-05-01-preview",
       "location": "[resourceGroup().location]",
