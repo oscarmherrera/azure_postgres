@@ -127,6 +127,47 @@
           ]
         }
     },
+   
+    {
+        "apiVersion": "2016-06-01",
+        "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+        "name": "[concat(variables('vnetName'),0,'/LinkTo',variables('vnetName'),1)]",
+        "location": "[parameters('etcdSiteLocations')[0]]",
+        "dependsOn": [
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"
+        ],
+        "comments": "This is the peering from vNet 0 to vNet 1",
+        "properties": {
+            "allowVirtualNetworkAccess": "true",
+            "allowForwardedTraffic": "false",
+            "allowGatewayTransit": "false",
+            "useRemoteGateways": "false",
+            "remoteVirtualNetwork": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'),1)]"
+            }
+        }
+    },
+    {
+        "apiVersion": "2016-06-01",
+        "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+        "name": "[concat(variables('vnetName'),1,'/LinkTo',variables('vnetName'),0)]",
+        "location": "[parameters('etcdSiteLocations')[1]]",
+        "dependsOn": [
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"
+        ],
+        "comments": "This is the peering from vNet 1 to vNet 0",
+        "properties": {
+            "allowVirtualNetworkAccess": "true",
+            "allowForwardedTraffic": "false",
+            "allowGatewayTransit": "false",
+            "useRemoteGateways": "false",
+            "remoteVirtualNetwork": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'),0)]"
+            }
+        }
+    },
     {
         "type": "Microsoft.Network/networkInterfaces",
         "name": "[concat(variables('nicName'), copyindex())]",
@@ -211,6 +252,7 @@
         }
     
     }
+
   ],
   "outputs": {  }
 }
