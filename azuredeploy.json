@@ -197,7 +197,7 @@
         },
         "data": {
           "name": "data",
-          "prefix": "10.0.1.0/24",
+          "prefix": "10.0.10.0/24",
           "vnet": "[parameters('virtualNetworkName')]"
         }
       }
@@ -206,11 +206,6 @@
       "name": "pgsqlAvailabilitySet",
       "fdCount": 3,
       "udCount": 5
-    },
-    "etcdAvailabilitySetSettings": {
-      "name": "etcdAvailabilitySet",
-      "fdCount": 2,
-      "udCount": 2
     }
   },
   "resources": [
@@ -340,49 +335,6 @@
           },
           "dbType": {
             "value": "SLAVE"
-          }
-        }
-      }
-    },
-    {
-      "name": "etcd-node",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'shared')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('etcdVMSmall').vmTemplate]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "osSettings": {
-            "value": "[variables('osSettings')]"
-          },
-          "subnet": {
-            "value": "[variables('networkSettings').subnets.data]"
-          },
-          "commonSettings": {
-            "value": {
-              "adminUsername": "[parameters('adminUsername')]",
-              "namespace": "etcd"
-            }
-          },
-          "storageSettings": {
-            "value": "[variables('etcdVMSmall').storage]"
-          },
-          "machineSettings": {
-            "value": {
-              "vmSize": "[variables('etcdVMSmall').vmSize]",
-              "diskSize": "[variables('etcdVMSmall').diskSize]",
-              "vmCount": "[variables('etcdVMSmall').vmCount]",
-              "availabilitySet": "[variables('etcdAvailabilitySetSettings').name]"
-            }
           }
         }
       }
