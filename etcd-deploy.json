@@ -16,6 +16,39 @@
         "description": "The type of replication to use for the storage account."
       }
     },
+    "etcdSiteLocations": {
+        "type": "array",
+        "defaultValue": [
+            "East US",
+            "Central US",
+            "West US"
+        ],
+        "metadata": {
+            "description": "Etcd Locations"
+        }
+    },
+    "etcdRegionIP": {
+        "type": "array",
+        "defaultValue": [
+            "10.0.10.100",
+            "10.0.11.100",
+            "10.0.12.100"
+        ],
+        "metadata": {
+            "description": "Etcd Locations"
+        }
+    },
+    "etcdRegionSubnet": {
+        "type": "array",
+        "defaultValue": [
+            "10.0.10.0/24",
+            "10.0.11.0/24",
+            "10.0.12.0/24"
+        ],
+        "metadata": {
+            "description": "Etcd Locations"
+        }
+    },      
     "storageNamePrefix": {
       "type": "string",
       "maxLength": 13,
@@ -26,6 +59,7 @@
     },
     "adminUsername": {
         "type": "string",
+        "defaultValue": "azureuser",
         "metadata": {
           "description": "Admin username"
         }
@@ -38,7 +72,7 @@
     },
     "numberOfEtcdInstances": {
         "type": "int",
-        "defaultValue": 1,
+        "defaultValue": 3,
         "metadata": {
             "description" : "The total number of etcd VMs."
         }
@@ -47,12 +81,10 @@
   "variables": {
     "addressPrefix": "10.0.0.0/16",
     "storageName": "[concat(toLower(parameters('storageNamePrefix')), uniqueString(resourceGroup().id))]",
-    "nicName": "myNic1",
-    "vnetName": "etcdVNet1",
+    "nicName": "etcdNic",
+    "vnetName": "etcdVNet",
     "subnetName": "etcdSubnet",
-    "subnetPrefix": "10.0.1.0/24",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]"
   },
   "resources": [
     {
@@ -69,9 +101,13 @@
     },
     {
         "type": "Microsoft.Network/virtualNetworks",
-        "name": "[variables('vnetName')]",
+        "name": "[concat(variables('vnetName'), copyindex())]",
         "apiVersion": "2016-03-30",
-        "location": "[resourceGroup().location]",
+        "location": "[parameters('etcdSiteLocations')[copyindex()]]",
+        "copy": {
+            "name": "virtualNetworksLoop", 
+            "count": "[parameters('numberOfEtcdInstances')]"
+          },
         "properties": {
           "addressSpace": {
             "addressPrefixes": [
@@ -85,7 +121,7 @@
             {
               "name": "[variables('subnetName')]",
               "properties": {
-                "addressPrefix": "[variables('subnetPrefix')]"
+                "addressPrefix": "[parameters('etcdRegionSubnet')[copyindex()]]"
               }
             }
           ]
@@ -93,21 +129,25 @@
     },
     {
         "type": "Microsoft.Network/networkInterfaces",
-        "name": "[variables('nicName')]",
+        "name": "[concat(variables('nicName'), copyindex())]",
         "apiVersion": "2016-03-30",
-        "location": "[resourceGroup().location]",
+        "location": "[parameters('etcdSiteLocations')[copyindex()]]",
+        "copy": {
+            "name": "networkInterfaceLoop", 
+            "count": "[parameters('numberOfEtcdInstances')]"
+          },
         "dependsOn": [
-          "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+          "[resourceId('Microsoft.Network/virtualNetworks', concat(variables('vnetName'), copyindex()))]"
         ],
         "properties": {
           "ipConfigurations": [
             {
               "name": "IPConfig-etcd",
               "properties": {
-                "privateIPAddress": "10.0.1.50",
+                "privateIPAddress": "[parameters('etcdRegionIP')[copyindex()]]",
                 "privateIPAllocationMethod": "Static",
                 "subnet": {
-                  "id": "[variables('subnetRef')]"
+                    "id": "[concat(variables('vnetID'),copyindex(),'/subnets/',variables('subnetName'))]"
                 }
               }
             }
@@ -118,14 +158,14 @@
       "apiVersion": "2016-04-30-preview", 
       "type": "Microsoft.Compute/virtualMachines", 
       "name": "[concat('etcd-vm-', copyindex())]", 
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('etcdSiteLocations')[copyindex()]]",
       "copy": {
         "name": "virtualMachineLoop", 
         "count": "[parameters('numberOfEtcdInstances')]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageName'))]",
-        "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]" 
+        "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'), copyindex()))]" 
       ], 
       "properties": { 
         "hardwareProfile": { 
@@ -161,7 +201,7 @@
           "networkProfile": { 
             "networkInterfaces": [ 
                { 
-               "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+               "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nicName'), copyindex()))]",
                "properties": {
                    "primary": true
                    } 
