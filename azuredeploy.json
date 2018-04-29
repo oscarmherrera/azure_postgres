@@ -79,23 +79,6 @@
   "variables": {
     "templateBaseUrl": "https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/",
     "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
-    "etcdVMSmall": {
-      "vmSize": "Standard_A1",
-      "diskSize": 1023,
-      "vmTemplate": "[concat(variables('templateBaseUrl'), 'database-2disk-resources.json')]",
-      "vmCount": 2,
-      "slaveCount": 1,
-      "storage": {
-        "name": "[parameters('storageAccountNamePrefix')]",
-        "count": 1,
-        "pool": "db",
-        "map": [
-          0,
-          0
-        ],
-        "jumpbox": 0
-      }
-    },
     "tshirtSizeSmall": {
       "vmSize": "Standard_A1",
       "diskSize": 1023,
@@ -210,6 +193,22 @@
   },
   "resources": [
     {
+      "apiVersion": "2017-05-10",
+      "name": "linkedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd-deploy.json",
+            "contentVersion":"1.0.0.0"
+         },
+         "parameters": {
+            "adminUsername":{"value": "[parameters('adminUsername')]"},
+            "adminPassword":{"value": "[parameters('adminPassword')]"}
+          }
+      }
+    },
+    {
       "name": "shared",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
@@ -228,9 +227,6 @@
           },
           "availabilitySetSettings": {
             "value": "[variables('availabilitySetSettings')]"
-          },
-          "etcdAvailabilitySetSettings": {
-            "value": "[variables('etcdAvailabilitySetSettings')]"
           }
         }
       }
