@@ -1,0 +1,176 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageSKU": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ],
+      "defaultValue": "Standard_LRS",
+      "metadata": {
+        "description": "The type of replication to use for the storage account."
+      }
+    },
+    "storageNamePrefix": {
+      "type": "string",
+      "maxLength": 13,
+      "defaultValue": "ha1postgres",
+      "metadata": {
+        "description": "The value to use for starting the storage account name. Use only lowercase letters and numbers."
+      }
+    },
+    "adminUsername": {
+        "type": "string",
+        "metadata": {
+          "description": "Admin username"
+        }
+    },
+    "adminPassword": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Admin password"
+        }
+    },
+    "numberOfEtcdInstances": {
+        "type": "int",
+        "defaultValue": 1,
+        "metadata": {
+            "description" : "The total number of etcd VMs."
+        }
+    }
+  },
+  "variables": {
+    "addressPrefix": "10.0.0.0/16",
+    "storageName": "[concat(toLower(parameters('storageNamePrefix')), uniqueString(resourceGroup().id))]",
+    "nicName": "myNic1",
+    "vnetName": "etcdVNet1",
+    "subnetName": "etcdSubnet",
+    "subnetPrefix": "10.0.1.0/24",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
+  },
+  "resources": [
+    {
+      "name": "[variables('storageName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "[parameters('storageSKU')]"
+      },
+      "kind": "Storage",
+      "location": "Central US",
+      "tags": {},
+      "properties": {}
+    },
+    {
+        "type": "Microsoft.Network/virtualNetworks",
+        "name": "[variables('vnetName')]",
+        "apiVersion": "2016-03-30",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "[variables('addressPrefix')]"
+            ]
+          },
+          "dhcpOptions": {
+            "dnsServers": []
+          },
+          "subnets": [
+            {
+              "name": "[variables('subnetName')]",
+              "properties": {
+                "addressPrefix": "[variables('subnetPrefix')]"
+              }
+            }
+          ]
+        }
+    },
+    {
+        "type": "Microsoft.Network/networkInterfaces",
+        "name": "[variables('nicName')]",
+        "apiVersion": "2016-03-30",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "IPConfig-etcd",
+              "properties": {
+                "privateIPAddress": "10.0.1.50",
+                "privateIPAllocationMethod": "Static",
+                "subnet": {
+                  "id": "[variables('subnetRef')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+    { 
+      "apiVersion": "2016-04-30-preview", 
+      "type": "Microsoft.Compute/virtualMachines", 
+      "name": "[concat('etcd-vm-', copyindex())]", 
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "virtualMachineLoop", 
+        "count": "[parameters('numberOfEtcdInstances')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]" 
+      ], 
+      "properties": { 
+        "hardwareProfile": { 
+          "vmSize": "Basic_A1" 
+        }, 
+        "osProfile": { 
+          "computername": "[concat('etcd-   VM', copyindex())]", 
+          "adminUsername": "[parameters('adminUsername')]", 
+          "adminPassword": "[parameters('adminPassword')]" 
+        }, 
+        "storageProfile": { 
+            "imageReference": {
+                "publisher": "credativ",
+                "offer": "Debian",
+                "sku": "8",
+                "version": "latest"
+              },
+
+          "osDisk": { 
+            "name": "[concat('etcdOSDisk', copyindex())]",
+            "caching": "ReadWrite", 
+            "createOption": "FromImage" 
+          },
+          "dataDisks": [
+            {
+              "name": "[concat('etcdDataDisk', copyindex())]",
+              "diskSizeGB": 5,
+              "lun": 0,
+              "createOption": "Empty"
+            }
+          ]
+        },
+          "networkProfile": { 
+            "networkInterfaces": [ 
+               { 
+               "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+               "properties": {
+                   "primary": true
+                   } 
+               } 
+           ] 
+           }   
+        }
+    
+    }
+  ],
+  "outputs": {  }
+}
