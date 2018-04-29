@@ -194,7 +194,7 @@
   "resources": [
     {
       "apiVersion": "2017-05-10",
-      "name": "linkedTemplate",
+      "name": "etcd",
       "type": "Microsoft.Resources/deployments",
       "properties": {
           "mode": "Incremental",
