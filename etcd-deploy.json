@@ -30,9 +30,9 @@
     "etcdRegionIP": {
         "type": "array",
         "defaultValue": [
-            "10.0.10.100",
-            "10.0.11.100",
-            "10.0.12.100"
+            "10.10.5.100",
+            "10.11.5.100",
+            "10.12.5.100"
         ],
         "metadata": {
             "description": "Etcd Locations"
@@ -41,9 +41,9 @@
     "etcdRegionSubnet": {
         "type": "array",
         "defaultValue": [
-            "10.0.10.0/24",
-            "10.0.11.0/24",
-            "10.0.12.0/24"
+            "10.10.5.0/24",
+            "10.11.5.0/24",
+            "10.12.5.0/24"
         ],
         "metadata": {
             "description": "Etcd Locations"
@@ -79,12 +79,14 @@
     }
   },
   "variables": {
-    "addressPrefix": "10.0.0.0/16",
     "storageName": "[concat(toLower(parameters('storageNamePrefix')), uniqueString(resourceGroup().id))]",
     "nicName": "etcdNic",
     "vnetName": "etcdVNet",
     "subnetName": "etcdSubnet",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]"
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
+    "vnetID0": "[resourceId('Microsoft.Network/virtualNetworks',concat(variables('vnetName'),'0'))]",
+    "vnetID1": "[resourceId('Microsoft.Network/virtualNetworks',concat(variables('vnetName'),'1'))]",
+    "vnetID2": "[resourceId('Microsoft.Network/virtualNetworks',concat(variables('vnetName'),'2'))]"
   },
   "resources": [
     {
@@ -111,7 +113,7 @@
         "properties": {
           "addressSpace": {
             "addressPrefixes": [
-              "[variables('addressPrefix')]"
+                "[parameters('etcdRegionSubnet')[copyindex()]]"
             ]
           },
           "dhcpOptions": {
@@ -131,7 +133,7 @@
     {
         "apiVersion": "2016-06-01",
         "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-        "name": "[concat(variables('vnetName'),0,'/LinkTo',variables('vnetName'),1)]",
+        "name": "[concat(variables('vnetName'),0,'/Link',variables('vnetName'),1)]",
         "location": "[parameters('etcdSiteLocations')[0]]",
         "dependsOn": [
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
@@ -144,27 +146,27 @@
             "allowGatewayTransit": "false",
             "useRemoteGateways": "false",
             "remoteVirtualNetwork": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'),1)]"
+                "id": "[variables('vnetID1')]"
             }
         }
     },
     {
         "apiVersion": "2016-06-01",
         "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-        "name": "[concat(variables('vnetName'),1,'/LinkTo',variables('vnetName'),0)]",
-        "location": "[parameters('etcdSiteLocations')[1]]",
+        "name": "[concat(variables('vnetName'),1,'/Link',variables('vnetName'),0)]",
+        "location": "[parameters('etcdSiteLocations')[0]]",
         "dependsOn": [
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"
         ],
-        "comments": "This is the peering from vNet 1 to vNet 0",
+        "comments": "This is the peering from vNet 0 to vNet 1",
         "properties": {
             "allowVirtualNetworkAccess": "true",
             "allowForwardedTraffic": "false",
             "allowGatewayTransit": "false",
             "useRemoteGateways": "false",
             "remoteVirtualNetwork": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'),0)]"
+                "id": "[variables('vnetID0')]"
             }
         }
     },
