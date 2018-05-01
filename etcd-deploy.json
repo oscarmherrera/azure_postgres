@@ -48,7 +48,19 @@
         "metadata": {
             "description": "Etcd Locations"
         }
-    },      
+    }, 
+    "etcdRegionOrdinal": {
+        "type": "array",
+        "defaultValue": [
+            0,
+            1,
+            2,
+            0
+        ],
+        "metadata": {
+            "description": "Etcd Ordinal"
+        }
+    },     
     "storageNamePrefix": {
       "type": "string",
       "maxLength": 13,
@@ -133,43 +145,29 @@
     {
         "apiVersion": "2016-06-01",
         "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-        "name": "[concat(variables('vnetName'),0,'/Link',variables('vnetName'),1)]",
-        "location": "[parameters('etcdSiteLocations')[0]]",
+        "name": "[concat(variables('vnetName'),copyindex(),'/Link',variables('vnetName'),parameters('etcdRegionOrdinal')[add(copyindex(),1)])]",
+        "location": "[parameters('etcdSiteLocations')[copyindex()]]",
+        "copy": {
+            "name": "networkInterfaceLoop", 
+            "count": "[parameters('numberOfEtcdInstances')]"
+          },
         "dependsOn": [
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"
         ],
-        "comments": "This is the peering from vNet 0 to vNet 1",
+        "comments": "This is the peering from vNet to vNet ",
         "properties": {
             "allowVirtualNetworkAccess": "true",
             "allowForwardedTraffic": "false",
             "allowGatewayTransit": "false",
             "useRemoteGateways": "false",
             "remoteVirtualNetwork": {
-                "id": "[variables('vnetID1')]"
+                "id": "[concat(variables('vnetID'),parameters('etcdRegionOrdinal')[add(copyindex(),1)])]"
             }
         }
     },
-    {
-        "apiVersion": "2016-06-01",
-        "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-        "name": "[concat(variables('vnetName'),1,'/Link',variables('vnetName'),0)]",
-        "location": "[parameters('etcdSiteLocations')[0]]",
-        "dependsOn": [
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"
-        ],
-        "comments": "This is the peering from vNet 0 to vNet 1",
-        "properties": {
-            "allowVirtualNetworkAccess": "true",
-            "allowForwardedTraffic": "false",
-            "allowGatewayTransit": "false",
-            "useRemoteGateways": "false",
-            "remoteVirtualNetwork": {
-                "id": "[variables('vnetID0')]"
-            }
-        }
-    },
+
     {
         "type": "Microsoft.Network/networkInterfaces",
         "name": "[concat(variables('nicName'), copyindex())]",
