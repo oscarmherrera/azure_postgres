@@ -14,7 +14,7 @@
         "description": "Source Vnet"
       }
     },
-    "etcdSiteLocation": {
+    "etcdSite": {
       "type": "string",
       "metadata": {
         "description": "Source Vnet"
@@ -29,7 +29,7 @@
         "apiVersion": "2016-06-01",
         "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
         "name": "[concat(parameters('vnetFrom'),'/Link',parameters('vnetTo'))]",
-        "location": "[parameters('etcdSiteLocation')]",
+        "location": "[parameters('etcdSite')]",
         "comments": "This is the peering from vNet to vNet ",
         "properties": {
             "allowVirtualNetworkAccess": "true",
