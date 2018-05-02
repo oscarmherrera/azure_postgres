@@ -49,18 +49,6 @@
             "description": "Etcd Locations"
         }
     }, 
-    "etcdRegionOrdinal": {
-        "type": "array",
-        "defaultValue": [
-            0,
-            1,
-            2,
-            0
-        ],
-        "metadata": {
-            "description": "Etcd Ordinal"
-        }
-    },     
     "storageNamePrefix": {
       "type": "string",
       "maxLength": 13,
