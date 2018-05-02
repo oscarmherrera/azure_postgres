@@ -140,7 +140,7 @@
     },
     {
         "apiVersion": "2017-05-10",
-        "name": "etcd",
+        "name": "etcdPeering1",
         "type": "Microsoft.Resources/deployments",
         "dependsOn": [
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
@@ -153,6 +153,7 @@
               "contentVersion":"1.0.0.0"
            },
            "parameters": {
+            "etcdSite":  "[parameters('etcdSiteLocations')[0]]",
             "vnetFrom":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]"},
             "vnetTo":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"}
             }
@@ -160,7 +161,7 @@
       },
       {
         "apiVersion": "2017-05-10",
-        "name": "etcd",
+        "name": "etcdPeering2",
         "type": "Microsoft.Resources/deployments",
         "dependsOn": [
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]",
@@ -173,6 +174,7 @@
               "contentVersion":"1.0.0.0"
            },
            "parameters": {
+            "etcdSite":  "[parameters('etcdSiteLocations')[1]]",
             "vnetFrom":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"},
             "vnetTo":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"}
             }
@@ -180,7 +182,7 @@
       },
       {
         "apiVersion": "2017-05-10",
-        "name": "etcd",
+        "name": "etcdPeering3",
         "type": "Microsoft.Resources/deployments",
         "dependsOn": [
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
@@ -193,6 +195,7 @@
               "contentVersion":"1.0.0.0"
            },
            "parameters": {
+            "etcdSite":  "[parameters('etcdSiteLocations')[2]]",
             "vnetFrom":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"},
             "vnetTo":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]"}
             }
