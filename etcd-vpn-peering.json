@@ -1,0 +1,47 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetTo": {
+      "type": "string",
+      "metadata": {
+        "description": "Source Vnet"
+      }
+    },
+    "vnetFrom": {
+      "type": "string",
+      "metadata": {
+        "description": "Source Vnet"
+      }
+    },
+    "etcdSiteLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "Source Vnet"
+      }
+    }
+  },
+  "variables": {
+    
+  },
+  "resources": [
+    {
+        "apiVersion": "2016-06-01",
+        "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+        "name": "[concat(parameters('vnetFrom'),'/Link',parameters('vnetTo'))]",
+        "location": "[parameters('etcdSiteLocation')]",
+        "comments": "This is the peering from vNet to vNet ",
+        "properties": {
+            "allowVirtualNetworkAccess": "true",
+            "allowForwardedTraffic": "false",
+            "allowGatewayTransit": "false",
+            "useRemoteGateways": "false",
+            "remoteVirtualNetwork": {
+                "id": "[parameters('vnetTo')]"
+            }
+        }
+    }
+
+  ],
+  "outputs": {  }
+}

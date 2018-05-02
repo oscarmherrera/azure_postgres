@@ -95,10 +95,7 @@
     "nicName": "etcdNic",
     "vnetName": "etcdVNet",
     "subnetName": "etcdSubnet",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
-    "vnetID0": "[resourceId('Microsoft.Network/virtualNetworks',concat(variables('vnetName'),'0'))]",
-    "vnetID1": "[resourceId('Microsoft.Network/virtualNetworks',concat(variables('vnetName'),'1'))]",
-    "vnetID2": "[resourceId('Microsoft.Network/virtualNetworks',concat(variables('vnetName'),'2'))]"
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]"
   },
   "resources": [
     {
@@ -141,33 +138,66 @@
           ]
         }
     },
-   
     {
-        "apiVersion": "2016-06-01",
-        "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-        "name": "[concat(variables('vnetName'),copyindex(),'/Link',variables('vnetName'),parameters('etcdRegionOrdinal')[add(copyindex(),1)])]",
-        "location": "[parameters('etcdSiteLocations')[copyindex()]]",
-        "copy": {
-            "name": "networkInterfaceLoop", 
-            "count": "[parameters('numberOfEtcdInstances')]"
-          },
+        "apiVersion": "2017-05-10",
+        "name": "etcd",
+        "type": "Microsoft.Resources/deployments",
         "dependsOn": [
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd-vpn-peering.json",
+              "contentVersion":"1.0.0.0"
+           },
+           "parameters": {
+            "vnetFrom":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]"},
+            "vnetTo":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"}
+            }
+        }
+      },
+      {
+        "apiVersion": "2017-05-10",
+        "name": "etcd",
+        "type": "Microsoft.Resources/deployments",
+        "dependsOn": [
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]",
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"
         ],
-        "comments": "This is the peering from vNet to vNet ",
         "properties": {
-            "allowVirtualNetworkAccess": "true",
-            "allowForwardedTraffic": "false",
-            "allowGatewayTransit": "false",
-            "useRemoteGateways": "false",
-            "remoteVirtualNetwork": {
-                "id": "[concat(variables('vnetID'),parameters('etcdRegionOrdinal')[add(copyindex(),1)])]"
+            "mode": "Incremental",
+            "templateLink": {
+              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd-vpn-peering.json",
+              "contentVersion":"1.0.0.0"
+           },
+           "parameters": {
+            "vnetFrom":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"},
+            "vnetTo":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"}
             }
         }
-    },
-
+      },
+      {
+        "apiVersion": "2017-05-10",
+        "name": "etcd",
+        "type": "Microsoft.Resources/deployments",
+        "dependsOn": [
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd-vpn-peering.json",
+              "contentVersion":"1.0.0.0"
+           },
+           "parameters": {
+            "vnetFrom":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"},
+            "vnetTo":{"value": "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]"}
+            }
+        }
+      },
     {
         "type": "Microsoft.Network/networkInterfaces",
         "name": "[concat(variables('nicName'), copyindex())]",
