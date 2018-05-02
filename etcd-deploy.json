@@ -153,7 +153,8 @@
               "contentVersion":"1.0.0.0"
            },
            "parameters": {
-            "etcdSite":  {"value": "[parameters('etcdSiteLocations')[0]]"},
+            "etcdSiteFrom":  {"value": "[parameters('etcdSiteLocations')[0]]"},
+            "etcdSiteTo":  {"value": "[parameters('etcdSiteLocations')[1]]"},
             "vnetFrom":{"value": "[concat(variables('vnetName'),0)]"},
             "vnetTo":{"value": "[concat(variables('vnetName'),1)]"}
             }
@@ -174,7 +175,8 @@
               "contentVersion":"1.0.0.0"
            },
            "parameters": {
-            "etcdSite":  {"value": "[parameters('etcdSiteLocations')[1]]"},
+            "etcdSiteFrom":  {"value": "[parameters('etcdSiteLocations')[1]]"},
+            "etcdSiteTo":  {"value": "[parameters('etcdSiteLocations')[2]]"},
             "vnetFrom":{"value": "[concat(variables('vnetName'),1)]"},
             "vnetTo":{"value": "[concat(variables('vnetName'),2)]"}
             }
@@ -195,7 +197,8 @@
               "contentVersion":"1.0.0.0"
            },
            "parameters": {
-            "etcdSite":  {"value": "[parameters('etcdSiteLocations')[2]]"},
+            "etcdSiteFrom":  {"value": "[parameters('etcdSiteLocations')[2]]"},
+            "etcdSiteTo":  {"value": "[parameters('etcdSiteLocations')[0]]"},
             "vnetFrom":{"value": "[concat(variables('vnetName'),2)]"},
             "vnetTo":{"value": "[concat(variables('vnetName'),0)]"}
             }

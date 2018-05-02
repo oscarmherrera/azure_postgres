@@ -14,7 +14,13 @@
         "description": "Source Vnet"
       }
     },
-    "etcdSite": {
+    "etcdSiteFrom": {
+      "type": "string",
+      "metadata": {
+        "description": "Source Vnet"
+      }
+    },
+    "etcdSiteTo": {
       "type": "string",
       "metadata": {
         "description": "Source Vnet"
@@ -29,7 +35,7 @@
         "apiVersion": "2016-06-01",
         "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
         "name": "[concat(parameters('vnetFrom'),'/Link',parameters('vnetTo'))]",
-        "location": "[string(parameters('etcdSite'))]",
+        "location": "[string(parameters('etcdSiteFrom'))]",
         "comments": "This is the peering from vNet to vNet ",
         "properties": {
             "allowVirtualNetworkAccess": "true",
@@ -40,8 +46,23 @@
                 "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetTo'))]"
             }
         }
-    }
-
+    },
+    {
+      "apiVersion": "2016-06-01",
+      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+      "name": "[concat(parameters('vnetTo'),'/Link',parameters('vnetFrom'))]",
+      "location": "[string(parameters('etcdSiteTo'))]",
+      "comments": "This is the peering from vNet to vNet ",
+      "properties": {
+          "allowVirtualNetworkAccess": "true",
+          "allowForwardedTraffic": "false",
+          "allowGatewayTransit": "false",
+          "useRemoteGateways": "false",
+          "remoteVirtualNetwork": {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetFrom'))]"
+          }
+      }
+  }
   ],
   "outputs": {  }
 }
