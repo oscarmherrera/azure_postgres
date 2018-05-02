@@ -37,7 +37,7 @@
             "allowGatewayTransit": "false",
             "useRemoteGateways": "false",
             "remoteVirtualNetwork": {
-                "id": "[parameters('vnetTo')]"
+                "id": "[concat('Microsoft.Network/virtualNetworks/', parameters('vnetTo'))]"
             }
         }
     }
