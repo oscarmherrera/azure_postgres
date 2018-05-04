@@ -35,7 +35,7 @@
         "apiVersion": "2016-06-01",
         "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
         "name": "[concat(parameters('vnetFrom'),'/Link',parameters('vnetTo'))]",
-        "location": "[string(parameters('etcdSiteFrom'))]",
+        "location": "[parameters('etcdSiteFrom')]",
         "comments": "This is the peering from vNet to vNet ",
         "properties": {
             "allowVirtualNetworkAccess": "true",
@@ -51,7 +51,7 @@
       "apiVersion": "2016-06-01",
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "name": "[concat(parameters('vnetTo'),'/Link',parameters('vnetFrom'))]",
-      "location": "[string(parameters('etcdSiteTo'))]",
+      "location": "[parameters('etcdSiteTo')]",
       "comments": "This is the peering from vNet to vNet ",
       "properties": {
           "allowVirtualNetworkAccess": "true",

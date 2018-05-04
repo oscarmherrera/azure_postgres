@@ -61,13 +61,13 @@ while getopts :n:1:2:3: optname; do
     n)
       NODEID=${OPTARG}
       ;;
-  	1) #Data storage subnet space
+  	1) #etcd cluser 0 ip address
       INFRA0=${OPTARG}
       ;;
-    2) #Type of node (MASTER/SLAVE)
+    2) #etcd cluser 1 ip address
       INFRA1=${OPTARG}
       ;;
-    3) #Replication Password
+    3) #etcd cluser 2 ip address
       INFRA2=${OPTARG}
       ;;
     h)  #show help
@@ -104,7 +104,10 @@ install_etcd_service() {
         cd etcd-v2.2.2-linux-amd64
         cp ./etcd /usr/sbin
         cp ./etcdctl /usr/sbin 
-        rm -rf ~/etcd_install
+        curl -L https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd.template -o etcd.initd
+        sed -e "s/\${node0Name}/infra0/" -e "s/\${node0IP}/$INFRA0/" etcd.initd
+
+        #rm -rf ~/etcd_install
 	
 	logger \"Done installing Etcd...\"
 }
