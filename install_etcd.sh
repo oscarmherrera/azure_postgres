@@ -33,9 +33,6 @@ then
     exit 3
 fi
 
-#Format the data disk
-bash vm-disk-utils-0.1.sh -s
-
 # TEMP FIX - Re-evaluate and remove when possible
 # This is an interim fix for hostname resolution in current VM (If it does not exist add it)
 grep -q \"${HOSTNAME}\" /etc/hosts
@@ -95,10 +92,19 @@ install_etcd_service() {
 	logger \"Start installing etcd...\"
 	# Re-synchronize the package index files from their sources. An update should always be performed before an upgrade.
 	logger \"Start Update of Packages...\"
-	# apt-get -o Acquire::ForceIPv4=true -y update
+	apt-get -o Acquire::ForceIPv4=true -y update
 	logger \"Finished Update of Packages...\"
 
-  apt-get -y install etcd
+	mkdir ~/etcd_install
+	cd ~/etcd_install
+	sudo apt-get install curl -y
+	curl -L  https://github.com/coreos/etcd/releases/download/v2.2.2/etcd-v2.2.2-linux-amd64.tar.gz -o etcd-v2.2.2-linux-amd64.tar.gz
+	tar xzvf etcd-v2.2.2-linux-amd64.tar.gz
+	rm etcd-v2.2.2-linux-amd64.tar.gz
+        cd etcd-v2.2.2-linux-amd64
+        cp ./etcd /usr/sbin
+        cp ./etcdctl /usr/sbin 
+        rm -rf ~/etcd_install
 	
 	logger \"Done installing Etcd...\"
 }
