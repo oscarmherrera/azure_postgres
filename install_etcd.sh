@@ -55,7 +55,7 @@ INFRA1=\"\"
 INFRA2=\"\"
 
 #Loop through options passed
-while getopts :n:1:2:3: optname; do
+while getopts :n:1:2:3:k: optname; do
     log \"Option $optname set with value ${OPTARG}\"
   case $optname in
     n)
@@ -70,6 +70,9 @@ while getopts :n:1:2:3: optname; do
     3) #etcd cluser 2 ip address
       INFRA2=${OPTARG}
       ;;
+    k) #etcd cluser key 
+      KEY=${OPTARG}
+      ;;
     h)  #show help
       help
       exit 2
@@ -83,8 +86,6 @@ while getopts :n:1:2:3: optname; do
 done
 
 PORT=2380
-export ETCD_INITIAL_CLUSTER="infra0=${INFR0}:${PORT},infra1=${INFR1}:${PORT},infra2=${INFR2}:${PORT}"
-export ETCD_INITIAL_CLUSTER_STATE=new
 
 logger \" NOW=$now ETCD_INITIAL_CLUSTER=${ETCD_INITIAL_CLUSTER} \"
 
@@ -105,18 +106,21 @@ install_etcd_service() {
         cp ./etcd /usr/sbin
         cp ./etcdctl /usr/sbin 
         curl -L https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd.template -o etcd.initd
-        if [$NODEID == 0  ] then
-        sed -e "s/\${node0Name}/infra0/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA0/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
+        if [[ "$NODEID" -eq 0 ]]; then
+        sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${node0Name}/infra0/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA0/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
         fi
 
-        if [$NODEID == 1  ] then
-        sed -e "s/\${node1Name}/infra1/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA1/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
+        if [[ "$NODEID" -eq 1 ]]; then
+        sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${node1Name}/infra1/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA1/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
         fi
 
-        if [$NODEID == 2  ] then
-        sed -e "s/\${node2Name}/infra2/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA2/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
+        if [[ "$NODEID" -eq 2 ]]; then
+        sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${node2Name}/infra2/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA2/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
         fi
-        #rm -rf ~/etcd_install
+
+	cp ~/etcd_install/etcd-v2.2.2-linux-amd64/etcd.initd /etc/init.d/etcd
+
+        rm -rf ~/etcd_install
 	
 	logger \"Done installing Etcd...\"
 }
