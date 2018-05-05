@@ -84,12 +84,13 @@
     "vnetName": "etcdVNet",
     "subnetName": "etcdSubnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
-    "Token": "[guid(subscription().subscriptionId)]"
+    "Token": "[guid(subscription().subscriptionId)]",
+    "uniqueToken": "[uniqueString(variables('Token'))]"
 
   },
   "resources": [
     {
-      "name": "[concat(parameters('storageNamePrefix'),toLower(replace( parameters('etcdSiteLocations')[copyindex()],' ','')),Substring(variables('Token'),0,8) )]",
+      "name": "[concat(parameters('storageNamePrefix'),toLower(replace( parameters('etcdSiteLocations')[copyindex()],' ','')),Substring(variables('uniqueToken'),0,8) )]",
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2016-01-01",
       "sku": {
@@ -235,7 +236,7 @@
         "count": "[parameters('numberOfEtcdInstances')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('storageNamePrefix'),toLower(replace( parameters('etcdSiteLocations')[copyindex()],' ','')),Substring(variables('Token'),0,8)))]",
+        "[resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('storageNamePrefix'),toLower(replace( parameters('etcdSiteLocations')[copyindex()],' ','')),Substring(variables('uniqueToken'),0,8)))]",
         "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'), copyindex()))]" 
       ], 
       "properties": { 
