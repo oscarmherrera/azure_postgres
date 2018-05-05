@@ -14,13 +14,13 @@ NAME="example"
 PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
 APPDIR="/"
 APPBIN="/usr/sbin/etcd"
-APPARGS="--name ${node0Name} --initial-advertise-peer-urls http://${node0IP}:${PORT} \
+APPARGS="--name ${nodeName} --initial-advertise-peer-urls http://${node0IP}:${PORT} \
   --listen-peer-urls http://${node0IP}:${PORT} \
   --listen-client-urls http://${node0IP}:2379,http://127.0.0.1:2379 \
   --advertise-client-urls http://${node0IP}:2379 \
   --initial-cluster-token ${CLUSTER_KEY} \
   --initial-cluster infra0=http://${infra0IP}:${PORT},infra1=http://${infra1IP}:${PORT},infra2=http://${infra2IP}:${PORT} \
-  --initial-cluster-state new"
+  --initial-cluster-state new --debug true" 
 USER="root"
 GROUP="root"
 
