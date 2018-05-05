@@ -52,7 +52,7 @@
     "storageNamePrefix": {
       "type": "string",
       "maxLength": 13,
-      "defaultValue": "ha1postgres",
+      "defaultValue": "ha1etcd",
       "metadata": {
         "description": "The value to use for starting the storage account name. Use only lowercase letters and numbers."
       }
@@ -79,7 +79,6 @@
     }
   },
   "variables": {
-    "storageName": "[concat(toLower(parameters('storageNamePrefix')), uniqueString(resourceGroup().id))]",
     "extensionName": "etcdInstall-ext",
     "nicName": "etcdNic",
     "vnetName": "etcdVNet",
@@ -90,14 +89,18 @@
   },
   "resources": [
     {
-      "name": "[variables('storageName')]",
+      "name": "[concat(parameters('storageNamePrefix'),toLower(replace( parameters('etcdSiteLocations')[copyindex()],' ','')),Substring(variables('Token'),0,8) )]",
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2016-01-01",
       "sku": {
         "name": "[parameters('storageSKU')]"
       },
       "kind": "Storage",
-      "location": "Central US",
+      "location": "[parameters('etcdSiteLocations')[copyindex()]]",
+      "copy": {
+        "name": "storageLoop", 
+        "count": "[parameters('numberOfEtcdInstances')]"
+      },
       "tags": {},
       "properties": {}
     },
@@ -232,7 +235,7 @@
         "count": "[parameters('numberOfEtcdInstances')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('storageNamePrefix'),toLower(replace( parameters('etcdSiteLocations')[copyindex()],' ','')),Substring(variables('Token'),0,8)))]",
         "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'), copyindex()))]" 
       ], 
       "properties": { 
@@ -267,18 +270,18 @@
             }
           ]
         },
-          "networkProfile": { 
-            "networkInterfaces": [ 
-               { 
-               "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nicName'), copyindex()))]",
-               "properties": {
-                   "primary": true
-                   } 
-               } 
+        
+        "networkProfile": { 
+          "networkInterfaces": [ 
+             { 
+             "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nicName'), copyindex()))]",
+                "properties": {
+                "primary": true
+                } 
+             } 
            ] 
-           }   
-        }
-    
+           }  
+      }
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
