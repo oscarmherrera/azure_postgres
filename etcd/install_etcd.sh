@@ -118,7 +118,10 @@ install_etcd_service() {
         sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${node2Name}/infra2/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA2/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
         fi
 
-	cp ~/etcd_install/etcd-v2.2.2-linux-amd64/etcd.initd /etc/init.d/etcd
+	      cp ~/etcd_install/etcd-v2.2.2-linux-amd64/etcd.initd /etc/init.d/etcd
+        chmod +x /etc/init.d/etcd
+        systemctl daemon-reload
+        service etcd start
 
         rm -rf ~/etcd_install
 	
