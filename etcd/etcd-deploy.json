@@ -80,21 +80,13 @@
   },
   "variables": {
     "storageName": "[concat(toLower(parameters('storageNamePrefix')), uniqueString(resourceGroup().id))]",
+    "extensionName": "etcdInstall-ext",
     "nicName": "etcdNic",
     "vnetName": "etcdVNet",
     "subnetName": "etcdSubnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
-    "osSettings": {
-      "scripts": [
-        "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/shared_scripts/ubuntu/vm-disk-utils-0.1.sh"
-      ],
-      "imageReference": {
-        "publisher": "credativ",
-        "offer": "Debian",
-        "sku": "8",
-        "version": "latest"
-      }
-    }
+    "Token": "[guid(subscription().subscriptionId)]"
+
   },
   "resources": [
     {
@@ -246,26 +238,12 @@
       "properties": { 
         "hardwareProfile": { 
           "vmSize": "Basic_A1" 
-        }, 
-        "parameters": {
-          "NODEID": {
-            "value": "[copyindex()]"
-          },
-          "INFRA0": {
-            "value": "[parameters('etcdRegionIP')[0]]"
-          },
-          "INFRA1": {
-            "value": "[parameters('etcdRegionIP')[1]]"
-          },
-          "INFRA2": {
-            "value": "[parameters('etcdRegionIP')[2]]"
-          }
         },
         "osProfile": { 
           "computername": "[concat('etcd-   VM', copyindex())]", 
           "adminUsername": "[parameters('adminUsername')]", 
           "adminPassword": "[parameters('adminPassword')]"
-        }, 
+        },
         "storageProfile": { 
             "imageReference": {
                 "publisher": "credativ",
@@ -279,9 +257,7 @@
             "caching": "ReadWrite", 
             "createOption": "FromImage" 
           },
-          "osSettings": {
-            "value": "[variables('osSettings')]"
-          },
+
           "dataDisks": [
             {
               "name": "[concat('etcdDataDisk', copyindex())]",
@@ -303,6 +279,32 @@
            }   
         }
     
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat('etcd-vm-', copyindex(),'/', variables('extensionName'))]", 
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('etcdSiteLocations')[copyindex()]]",
+      "copy": {
+        "name": "virtualMachineLoop", 
+        "count": "[parameters('numberOfEtcdInstances')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', 'etcd-vm-', copyindex())]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/install_etcd.sh"
+          ],
+          "commandToExecute": "[concat('bash install_etcd.sh', ' -n ',copyindex(), ' -1 ', parameters('etcdRegionIP')[0],' -2 ', parameters('etcdRegionIP')[1],' -3 ',parameters('etcdRegionIP')[2],' -k ',variables('Token'))]"
+
+        }
+      }
     }
 
   ],

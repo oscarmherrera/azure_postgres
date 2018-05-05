@@ -75,12 +75,12 @@ while getopts :n:1:2:3:k: optname; do
       ;;
     h)  #show help
       help
-      exit 2
+      exit 3
       ;;
     \?) #unrecognized option - show help
       echo -e \\n\"Option -${BOLD}$OPTARG${NORM} not allowed.\"
       help
-      exit 2
+      exit 3
       ;;
   esac
 done
