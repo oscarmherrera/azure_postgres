@@ -137,7 +137,7 @@
         "properties": {
             "mode": "Incremental",
             "templateLink": {
-              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd-vpn-peering.json",
+              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd-vpn-peering.json",
               "contentVersion":"1.0.0.0"
            },
            "parameters": {
@@ -159,7 +159,7 @@
         "properties": {
             "mode": "Incremental",
             "templateLink": {
-              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd-vpn-peering.json",
+              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd-vpn-peering.json",
               "contentVersion":"1.0.0.0"
            },
            "parameters": {
@@ -181,7 +181,7 @@
         "properties": {
             "mode": "Incremental",
             "templateLink": {
-              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd-vpn-peering.json",
+              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd-vpn-peering.json",
               "contentVersion":"1.0.0.0"
            },
            "parameters": {
@@ -239,7 +239,10 @@
         "osProfile": { 
           "computername": "[concat('etcd-   VM', copyindex())]", 
           "adminUsername": "[parameters('adminUsername')]", 
-          "adminPassword": "[parameters('adminPassword')]" 
+          "adminPassword": "[parameters('adminPassword')]",
+          "scripts": [
+            "https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/install_etcd.sh"
+          ] 
         }, 
         "storageProfile": { 
             "imageReference": {

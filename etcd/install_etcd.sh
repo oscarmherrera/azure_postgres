@@ -105,7 +105,7 @@ install_etcd_service() {
         cd etcd-v2.2.2-linux-amd64
         cp ./etcd /usr/sbin
         cp ./etcdctl /usr/sbin 
-        curl -L https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd.template -o etcd.initd
+        curl -L https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd.template -o etcd.initd
         if [[ "$NODEID" -eq 0 ]]; then
         sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${node0Name}/infra0/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA0/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
         fi
