@@ -87,7 +87,7 @@ done
 
 PORT=2380
 
-logger \" NOW=$now ETCD_INITIAL_CLUSTER=${ETCD_INITIAL_CLUSTER} \"
+logger \" NOW=$now start parameters -n ${NODEID} -1 ${INFRA0} -2 ${INFRA1} -3 ${INFRA2} -k ${KEY}\"
 
 install_etcd_service() {
 	logger \"Start installing etcd...\"
@@ -99,31 +99,44 @@ install_etcd_service() {
 	mkdir ~/etcd_install
 	cd ~/etcd_install
 	sudo apt-get install curl -y
+  logger \"Installed curl return: $?\"
 	curl -L  https://github.com/coreos/etcd/releases/download/v2.2.2/etcd-v2.2.2-linux-amd64.tar.gz -o etcd-v2.2.2-linux-amd64.tar.gz
-	tar xzvf etcd-v2.2.2-linux-amd64.tar.gz
+  logger \"Downloaded etcd return: $?\"
+  tar xzvf etcd-v2.2.2-linux-amd64.tar.gz
 	rm etcd-v2.2.2-linux-amd64.tar.gz
         cd etcd-v2.2.2-linux-amd64
         cp ./etcd /usr/sbin
+        logger \"copied etcd to /usr/sbin return: $?\"
         cp ./etcdctl /usr/sbin 
+        logger \"copied etcdctl to /usr/sbin return: $?\"
         curl -L https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd.template -o etcd.initd
+        logger \"Downloaded the template return: $?\"
+
         if [[ "$NODEID" -eq 0 ]]; then
         sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${nodeName}/infra0/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA0/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
+        logger \"Finished replacement for infra0 return: $?\"
         fi
 
         if [[ "$NODEID" -eq 1 ]]; then
         sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${nodeName}/infra1/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA1/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
+        logger \"Finished replacement for infra1 return: $?\"
         fi
 
         if [[ "$NODEID" -eq 2 ]]; then
         sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${nodeName}/infra2/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA2/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
+        logger \"Finished replacement for infra0 return: $?\"
         fi
 
 	      cp ~/etcd_install/etcd-v2.2.2-linux-amd64/etcd.initd /etc/init.d/etcd
-        chmod +x /etc/init.d/etcd
-        systemctl daemon-reload
-        service etcd start
+        logger \"Copied init.d file return: $?\"
 
-        rm -rf ~/etcd_install
+        chmod +x /etc/init.d/etcd
+        systemctl enable etcd.service
+        logger \"Enabled etcd service return: $?\"
+        service etcd start
+        logger \"Started etcd return: $?\"
+
+        #rm -rf ~/etcd_install
 	
 	logger \"Done installing Etcd...\"
 }
