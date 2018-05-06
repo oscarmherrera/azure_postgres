@@ -85,7 +85,7 @@ while getopts :n:1:2:3:k: optname; do
   esac
 done
 
-PORT=2380
+PEERPORT=2380
 
 logger \" NOW=$now start parameters -n ${NODEID} -1 ${INFRA0} -2 ${INFRA1} -3 ${INFRA2} -k ${KEY}\"
 export ETCD_INITIAL_CLUSTER="infra0=http://${INFRA0}:${PORT},infra1=http://${INFRA1}:${PORT},infra2=http://${INFRA2}:${PORT}"
@@ -125,17 +125,17 @@ install_etcd_service() {
         logger \"Downloaded the template return: $?\"
 
         if [[ "$NODEID" -eq 0 ]]; then
-        sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${nodeName}/infra0/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA0/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
+        sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${nodeName}/infra0/"  -e "s/\${PORT}/${PEERPORT}/" -e "s/\${node0IP}/$INFRA0/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
         logger \"Finished replacement for infra0 return: $?\"
         fi
 
         if [[ "$NODEID" -eq 1 ]]; then
-        sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${nodeName}/infra1/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA1/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
+        sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${nodeName}/infra1/"  -e "s/\${PORT}/${PEERPORT}/" -e "s/\${node0IP}/$INFRA1/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
         logger \"Finished replacement for infra1 return: $?\"
         fi
 
         if [[ "$NODEID" -eq 2 ]]; then
-        sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${nodeName}/infra2/"  -e "s/\${PORT}/2378/" -e "s/\${node0IP}/$INFRA2/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
+        sed -i -e "s/\${CLUSTER_KEY}/${KEY}/" -e "s/\${nodeName}/infra2/"  -e "s/\${PORT}/${PEERPORT}/" -e "s/\${node0IP}/$INFRA2/" -e "s/\${infra0IP}/$INFRA0/" -e "s/\${infra1IP}/$INFRA1/" -e "s/\${infra2IP}/$INFRA2/" etcd.initd
         logger \"Finished replacement for infra0 return: $?\"
         fi
 
