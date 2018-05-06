@@ -85,7 +85,7 @@
     "subnetName": "etcdSubnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
     "Token": "[guid(subscription().subscriptionId)]",
-    "uniqueToken": "[uniqueString(variables('Token'))]"
+    "uniqueToken": "[uniqueString( resourceGroup().id, deployment().name, variables('Token'))]"
 
   },
   "resources": [
