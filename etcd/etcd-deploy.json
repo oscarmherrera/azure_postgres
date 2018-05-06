@@ -281,7 +281,13 @@
                 } 
              } 
            ] 
-           }  
+           },
+           "diagnosticsProfile": {
+            "bootDiagnostics": {
+                "enabled": true,
+                "storageUri": "[concat('https', '://', concat(parameters('storageNamePrefix'),toLower(replace( parameters('etcdSiteLocations')[copyindex()],' ','')),Substring(variables('uniqueToken'),0,8)), '.blob.core.windows.net', '/')]"
+            }
+        }  
       }
     },
     {
