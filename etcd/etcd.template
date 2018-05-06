@@ -10,7 +10,7 @@
 # Description:       Example start-stop-daemon - Debian
 ### END INIT INFO
 
-NAME="example"
+NAME="etcd"
 PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
 APPDIR="/"
 APPBIN="/usr/sbin/etcd"
@@ -22,7 +22,9 @@ APPARGS="--name ${nodeName} --initial-advertise-peer-urls http://${node0IP}:${PO
   --initial-cluster infra0=http://${infra0IP}:${PORT}, \
     infra1=http://${infra1IP}:${PORT}, \
     infra2=http://${infra2IP}:${PORT} \
-  --initial-cluster-state new --debug" 
+  --initial-cluster-state new \
+  --debug" 
+
 USER="root"
 GROUP="root"
 
