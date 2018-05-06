@@ -94,14 +94,15 @@ install_etcd_service() {
 	# Re-synchronize the package index files from their sources. An update should always be performed before an upgrade.
 	logger \"Start Update of Packages...\"
 	apt-get -o Acquire::ForceIPv4=true -y update
+  apt-get -o Acquire::ForceIPv4=true install -y apt-transport-https
+	apt-get -o Acquire::ForceIPv4=true install curl -y
+  logger \"Installed curl return: $?\"
 	logger \"Finished Update of Packages...\"
 
 	mkdir ~/etcd_install
   logger \"Make dir etcd_install return $?\"
 	cd ~/etcd_install
   logger \"cd dir etcd_install return $?\"
-	apt-get install curl -y
-  logger \"Installed curl return: $?\"
 	curl -L  https://github.com/coreos/etcd/releases/download/v2.2.2/etcd-v2.2.2-linux-amd64.tar.gz -o etcd-v2.2.2-linux-amd64.tar.gz
   logger \"Downloaded etcd return: $?\"
   tar xzvf etcd-v2.2.2-linux-amd64.tar.gz
