@@ -148,7 +148,9 @@ install_etcd_service() {
         service etcd start
         logger \"Started etcd return: $?\"
 
-        #rm -rf ~/etcd_install
+        rm -rf ~/etcd_install
+        #Eventually we have to set the firewall correctly but for now lets disable it
+        systemctl disable firewall
 	
 	logger \"Done installing Etcd...\"
 }
