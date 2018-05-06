@@ -56,9 +56,10 @@ MASTERIP=\"\"
 SUBNETADDRESS=\"\"
 NODETYPE=\"\"
 REPLICATORPASSWORD=\"\"
+CLUSTERNAME=\"\"
 
 #Loop through options passed
-while getopts :m:s:t:p: optname; do
+while getopts :m:s:t:p:c: optname; do
     log \"Option $optname set with value ${OPTARG}\"
   case $optname in
     m)
@@ -72,6 +73,9 @@ while getopts :m:s:t:p: optname; do
       ;;
     p) #Replication Password
       REPLICATORPASSWORD=${OPTARG}
+      ;;
+	c) #Cluster name
+      CLUSTERNAME=${OPTARG}
       ;;
     h)  #show help
       help
@@ -89,7 +93,50 @@ export PGPASSWORD=$REPLICATORPASSWORD
 
 logger \" NOW=$now MASTERIP=$MASTERIP SUBNETADDRESS=$SUBNETADDRESS NODETYPE={$NODETYPE} \"
 
+install_stolon() {
+
+logger \"Start installing of Stolon...\"
+mkdir ~/stolon
+logger \"Made Stolon install directory return: $?\"
+cd ~/stolon
+logger \"Changed to Stolon install directory return: $?\"
+
+wget https://github.com/oscarmherrera/azure_postgres/raw/master/stolon/debian/stolon-keeper -O stolon-keeper
+logger \"Downloaded stolon-keeper return: $?\"
+
+wget https://github.com/oscarmherrera/azure_postgres/raw/master/stolon/debian/stolon-sentinel -O stolon-sentinel
+logger \"Downloaded stolon-sentinel return: $?\"
+
+wget https://github.com/oscarmherrera/azure_postgres/raw/master/stolon/debian/stolon-proxy -O stolon-proxy
+logger \"Downloaded stolon-proxy return: $?\"
+
+wget https://github.com/oscarmherrera/azure_postgres/raw/master/stolon/debian/stolonctl -O stolonctl
+logger \"Downloaded stolonctl return: $?\"
+
+cp ./stolon-keeper /usr/bin/stolon-keeper
+logger \"Copied stolon-keeper to /usr/bin return: $?\"
+chmod +x /usr/bin/stolon-keeper
+logger \"chmod stolon-keeper return: $?\"
+
+cp ./stolon-sentinel /usr/bin/stolon-sentinel
+logger \"Copied stolon-sentinel to /usr/bin return: $?\"
+chmod +x /usr/bin/stolon-sentinel
+logger \"chmod stolon-sentinel return: $?\"
+
+cp ./stolon-proxy /usr/bin/stolon-proxy
+logger \"Copied stolon-proxy to /usr/bin return: $?\"
+chmod +x /usr/bin/stolon-proxy
+logger \"chmod stolon-sentinel return: $?\"
+
+cp ./stolonctl /usr/bin/stolonctl
+logger \"Copied stolonctl to /usr/bin return: $?\"
+chmod +x /usr/bin/stolonctl
+logger \"chmod stolon-sentinel return: $?\"
+
+}
+
 install_postgresql_service() {
+
 	logger \"Start installing PostgreSQL...\"
 	# Re-synchronize the package index files from their sources. An update should always be performed before an upgrade.
 	logger \"Start Update of Packages...\"
@@ -212,6 +259,8 @@ configure_streaming_replication() {
 }
 
 # MAIN ROUTINE
+install_stolon
+
 install_postgresql_service
 
 setup_datadisks
