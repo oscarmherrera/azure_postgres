@@ -2,6 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "pgClusterNamePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "prefix to be given to this cluster of pg servers"
+      }
+    },
     "storageAccountNamePrefix": {
       "type": "string",
       "metadata": {
@@ -150,6 +156,9 @@
         "jumpbox": 0
       }
     },
+    "Token": "[guid(subscription().subscriptionId)]",
+    "uniqueToken": "[uniqueString( resourceGroup().id, variables('Token'))]",
+    "pgClusterName": "[concat(parameters('pgClusterNamePrefix'),'_',Substring(variables('uniqueToken'),0,8) )]",
     "tshirtSize": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
     "HATemplateEnabled": "consul-resources.json",
     "HATemplateDisabled": "empty-resources.json",    
@@ -245,6 +254,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "pgClusterName": {
+            "value": "[variables('pgClusterName')]"
+          },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
@@ -297,6 +309,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "pgClusterName": {
+            "value": "[variables('pgClusterName')]"
+          },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
