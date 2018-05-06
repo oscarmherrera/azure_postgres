@@ -100,7 +100,7 @@ install_etcd_service() {
   logger \"Make dir etcd_install return $?\"
 	cd ~/etcd_install
   logger \"cd dir etcd_install return $?\"
-	sudo apt-get install curl -y
+	apt-get install curl -y
   logger \"Installed curl return: $?\"
 	curl -L  https://github.com/coreos/etcd/releases/download/v2.2.2/etcd-v2.2.2-linux-amd64.tar.gz -o etcd-v2.2.2-linux-amd64.tar.gz
   logger \"Downloaded etcd return: $?\"
