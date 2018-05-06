@@ -19,8 +19,10 @@ APPARGS="--name ${nodeName} --initial-advertise-peer-urls http://${node0IP}:${PO
   --listen-client-urls http://${node0IP}:2379,http://127.0.0.1:2379 \
   --advertise-client-urls http://${node0IP}:2379 \
   --initial-cluster-token ${CLUSTER_KEY} \
-  --initial-cluster infra0=http://${infra0IP}:${PORT},infra1=http://${infra1IP}:${PORT},infra2=http://${infra2IP}:${PORT} \
-  --initial-cluster-state new --debug true" 
+  --initial-cluster infra0=http://${infra0IP}:${PORT}, \
+    infra1=http://${infra1IP}:${PORT}, \
+    infra2=http://${infra2IP}:${PORT} \
+  --initial-cluster-state new --debug" 
 USER="root"
 GROUP="root"
 
