@@ -112,7 +112,7 @@ install_etcd_service() {
   logger \"Make dir etcd_install return $?\"
 	cd ~/etcd_install
   logger \"cd dir etcd_install return $?\"
-	curl -L  https://github.com/coreos/etcd/releases/download/v2.2.2/etcd-v2.2.2-linux-amd64.tar.gz -o etcd-v2.2.2-linux-amd64.tar.gz
+	wget -t 10 https://github.com/coreos/etcd/releases/download/v2.2.2/etcd-v2.2.2-linux-amd64.tar.gz -O etcd-v2.2.2-linux-amd64.tar.gz
   logger \"Downloaded etcd return: $?\"
   tar xzvf etcd-v2.2.2-linux-amd64.tar.gz
 	rm etcd-v2.2.2-linux-amd64.tar.gz
@@ -121,7 +121,7 @@ install_etcd_service() {
         logger \"copied etcd to /usr/sbin return: $?\"
         cp ./etcdctl /usr/sbin 
         logger \"copied etcdctl to /usr/sbin return: $?\"
-        curl -L https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd.template -o etcd.initd
+        wget -t 10 https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd.template -O etcd.initd
         logger \"Downloaded the template return: $?\"
 
         if [[ "$NODEID" -eq 0 ]]; then
