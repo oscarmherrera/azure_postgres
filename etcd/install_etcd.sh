@@ -88,6 +88,13 @@ done
 PORT=2380
 
 logger \" NOW=$now start parameters -n ${NODEID} -1 ${INFRA0} -2 ${INFRA1} -3 ${INFRA2} -k ${KEY}\"
+export ETCD_INITIAL_CLUSTER="infra0=http://${INFRA0}:${PORT},infra1=http://${INFRA1}:${PORT},infra2=http://${INFRA2}:${PORT}"
+logger \"ETCD INITIAL CLUSER: ${ETCD_INIETCD_INITIAL_CLUSTERTIAL_CLUSER}\"
+echo 'export ETCD_INITIAL_CLUSTER=${ETCD_INITIAL_CLUSTER}' >> ~/.profile
+
+export ETCD_INITIAL_CLUSTER_STATE=new
+echo 'export ETCD_INITIAL_CLUSTER=${ETCD_INITIAL_CLUSTER}' >> ~/.profile
+
 
 install_etcd_service() {
 	logger \"Start installing etcd...\"
