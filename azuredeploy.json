@@ -293,7 +293,13 @@
           "dbType": {
             "value": "MASTER"
           }
-        }
+        },
+           "diagnosticsProfile": {
+            "bootDiagnostics": {
+                "enabled": true,
+                "storageUri": "[concat('https', '://', concat(parameters('storageNamePrefix'), '.blob.core.windows.net', '/')]"
+            }
+        }  
       }
     },
     {
