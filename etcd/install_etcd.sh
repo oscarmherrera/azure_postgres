@@ -89,20 +89,22 @@ PORT=2380
 
 logger \" NOW=$now start parameters -n ${NODEID} -1 ${INFRA0} -2 ${INFRA1} -3 ${INFRA2} -k ${KEY}\"
 export ETCD_INITIAL_CLUSTER="infra0=http://${INFRA0}:${PORT},infra1=http://${INFRA1}:${PORT},infra2=http://${INFRA2}:${PORT}"
-logger \"ETCD INITIAL CLUSER: ${ETCD_INIETCD_INITIAL_CLUSTERTIAL_CLUSER}\"
-echo 'export ETCD_INITIAL_CLUSTER=${ETCD_INITIAL_CLUSTER}' >> ~/.profile
+logger \"ETCD INITIAL CLUSER: ${ETCD_INITIAL_CLUSTER}\"
+echo ${ETCD_INITIAL_CLUSTER}
+echo "export ETCD_INITIAL_CLUSTER='${ETCD_INITIAL_CLUSTER}'" >> ~/.profile
 
 export ETCD_INITIAL_CLUSTER_STATE=new
-echo 'export ETCD_INITIAL_CLUSTER=${ETCD_INITIAL_CLUSTER}' >> ~/.profile
+echo 'export ETCD_INITIAL_CLUSTER_STATE=new' >> ~/.profile
 
 
 install_etcd_service() {
+  sleep 10s
 	logger \"Start installing etcd...\"
 	# Re-synchronize the package index files from their sources. An update should always be performed before an upgrade.
 	logger \"Start Update of Packages...\"
 	apt-get -o Acquire::ForceIPv4=true -y update
   apt-get -o Acquire::ForceIPv4=true install -y apt-transport-https
-	apt-get -o Acquire::ForceIPv4=true install curl -y
+	apt-get -o Acquire::ForceIPv4=true install -y curl
   logger \"Installed curl return: $?\"
 	logger \"Finished Update of Packages...\"
 
