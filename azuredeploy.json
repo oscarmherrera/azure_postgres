@@ -161,7 +161,6 @@
     "uniqueToken": "[uniqueString( resourceGroup().id, variables('Token'))]",
     "pgClusterName": "[concat(parameters('pgClusterNamePrefix'),'_',Substring(variables('uniqueToken'),0,8) )]",
     "tshirtSize": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
-    "HATemplateEnabled": "consul-resources.json",
     "HATemplateDisabled": "empty-resources.json",    
     "jumpboxTemplateEnabled": "jumpbox-resources.json",
     "jumpboxTemplateDisabled": "empty-resources.json",
@@ -297,7 +296,7 @@
         "diagnosticsProfile": {
             "bootDiagnostics": {
                 "enabled": true,
-                "storageUri": "[concat('https', '://', concat(parameters('storageNamePrefix'), '.blob.core.windows.net', '/')]"
+                "storageUri": "[concat('https', '://', parameters('storageNamePrefix'), '.blob.core.windows.net', '/')]"
             }
         }  
       }
@@ -358,7 +357,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
               "enabled": true,
-              "storageUri": "[concat('https', '://', concat(parameters('storageNamePrefix'), '.blob.core.windows.net', '/')]"
+              "storageUri": "[concat('https', '://', parameters('storageNamePrefix'), '.blob.core.windows.net', '/')]"
           }
         } 
       }
