@@ -83,11 +83,7 @@
     }
   },
   "variables": {
-<<<<<<< HEAD
     "sourceBranch": "master",
-=======
-    "sourceBranch": "postgres_with_stolon",
->>>>>>> origin/postgres_with_stolon
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/oscarmherrera/azure_postgres/',variables('sourceBranch'),'/')]",
     "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
     "tshirtSizeSmall": {
