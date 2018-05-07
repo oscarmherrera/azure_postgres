@@ -133,6 +133,8 @@ logger \"Copied stolonctl to /usr/bin return: $?\"
 chmod +x /usr/bin/stolonctl
 logger \"chmod stolon-sentinel return: $?\"
 
+/usr/bin/stolonctl --cluster-name ${CLUSTERNAME} --store-backend=etcdv3 init
+logger \"Initializing stolon cluster with clustername - ${CLUSTERNAME} return: $?\"
 }
 
 install_postgresql_service() {
@@ -189,6 +191,9 @@ configure_streaming_replication() {
 		logger \"Create user replicator...\"
 		echo \"CREATE USER replicator WITH REPLICATION PASSWORD '$PGPASSWORD';\"
 		sudo -u postgres psql -c \"CREATE USER replicator WITH REPLICATION PASSWORD '$PGPASSWORD';\"
+
+		/usr/bin/stolon-sentinel --cluster-name ${CLUSTERNAME} --store-backend=etcdv3
+		logger \"Starting up lead sentinel clustername - ${CLUSTERNAME} return: $?\"
 	fi
 
 	# Stop service
@@ -253,9 +258,25 @@ configure_streaming_replication() {
 		sudo -u postgres echo \"standby_mode = 'on'\" > recovery.conf
 		sudo -u postgres echo \"primary_conninfo = 'host=$MASTERIP port=5432 user=replicator password=$PGPASSWORD'\" >> recovery.conf
 		sudo -u postgres echo \"trigger_file = '/var/lib/postgresql/9.6/main/failover'\" >> recovery.conf
+
+		/usr/bin/stolon-sentinel --cluster-name ${CLUSTERNAME} --store-backend=etcdv3
+		logger \"Starting up standby sentinel clustername - ${CLUSTERNAME} return: $?\"
 	fi
 	
 	logger \"Done configuring PostgreSQL streaming replication\"
+}
+
+start_stolon_keeper() {
+		/usr/bin/stolon-keeper --cluster-name ${CLUSTERNAME} \
+		--store-backend=etcdv3 \
+		--uid postgres \
+		--data-dir /datadisks/disk1/main \
+		--pg-su-password={$PGPASSWORD} \
+		--pg-repl-username=repluser \
+		--pg-repl-password=${PGPASSWORD} \
+		--pg-listen-address=127.0.0.1
+		logger \"Starting up stolon keeper  clustername - ${CLUSTERNAME} return: $?\"
+
 }
 
 # MAIN ROUTINE
@@ -265,10 +286,11 @@ install_postgresql_service
 
 setup_datadisks
 
-service postgresql start
+#service postgresql start
 
 configure_streaming_replication
 
-service postgresql start
+start_stolon_keeper
+#service postgresql start
 
 set +x

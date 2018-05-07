@@ -83,7 +83,11 @@
     }
   },
   "variables": {
+<<<<<<< HEAD
     "sourceBranch": "master",
+=======
+    "sourceBranch": "postgres_with_stolon",
+>>>>>>> origin/postgres_with_stolon
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/oscarmherrera/azure_postgres/',variables('sourceBranch'),'/')]",
     "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
     "tshirtSizeSmall": {
@@ -161,7 +165,6 @@
     "uniqueToken": "[uniqueString( resourceGroup().id, variables('Token'))]",
     "pgClusterName": "[concat(parameters('pgClusterNamePrefix'),'_',Substring(variables('uniqueToken'),0,8) )]",
     "tshirtSize": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
-    "HATemplateEnabled": "consul-resources.json",
     "HATemplateDisabled": "empty-resources.json",    
     "jumpboxTemplateEnabled": "jumpbox-resources.json",
     "jumpboxTemplateDisabled": "empty-resources.json",
@@ -293,7 +296,7 @@
           "dbType": {
             "value": "MASTER"
           }
-        }
+        } 
       }
     },
     {
