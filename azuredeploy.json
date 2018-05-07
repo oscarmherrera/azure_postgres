@@ -296,7 +296,7 @@
         "diagnosticsProfile": {
             "bootDiagnostics": {
                 "enabled": true,
-                "storageUri": "[concat('https', '://', parameters('storageNamePrefix'), '.blob.core.windows.net', '/')]"
+                "storageUri": "[concat('https', '://', parameters('storageAccountNamePrefix'), '.blob.core.windows.net', '/')]"
             }
         }  
       }
@@ -357,7 +357,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
               "enabled": true,
-              "storageUri": "[concat('https', '://', parameters('storageNamePrefix'), '.blob.core.windows.net', '/')]"
+              "storageUri": "[concat('https', '://', parameters('storageAccountNamePrefix'), '.blob.core.windows.net', '/')]"
           }
         } 
       }
