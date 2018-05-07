@@ -292,13 +292,7 @@
           "dbType": {
             "value": "MASTER"
           }
-        },
-        "diagnosticsProfile": {
-            "bootDiagnostics": {
-                "enabled": true,
-                "storageUri": "[concat('https', '://', parameters('storageAccountNamePrefix'), '.blob.core.windows.net', '/')]"
-            }
-        }  
+        } 
       }
     },
     {
@@ -353,13 +347,7 @@
           "dbType": {
             "value": "SLAVE"
           }
-        },
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-              "enabled": true,
-              "storageUri": "[concat('https', '://', parameters('storageAccountNamePrefix'), '.blob.core.windows.net', '/')]"
-          }
-        } 
+        }
       }
     },
     {
