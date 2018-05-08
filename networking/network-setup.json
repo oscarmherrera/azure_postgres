@@ -94,22 +94,6 @@
   },
   "resources": [
     {
-      "name": "[concat(parameters('storageNamePrefix'),toLower(replace( parameters('etcdSiteLocations')[copyindex()],' ','')),Substring(variables('uniqueToken'),0,8) )]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2016-01-01",
-      "sku": {
-        "name": "[parameters('storageSKU')]"
-      },
-      "kind": "Storage",
-      "location": "[parameters('etcdSiteLocations')[copyindex()]]",
-      "copy": {
-        "name": "storageLoop", 
-        "count": "[parameters('numberOfEtcdInstances')]"
-      },
-      "tags": {},
-      "properties": {}
-    },
-    {
         "type": "Microsoft.Network/virtualNetworks",
         "name": "[concat(variables('vnetName'), copyindex())]",
         "apiVersion": "2016-03-30",
@@ -183,7 +167,7 @@
       },
       {
         "apiVersion": "2017-05-10",
-        "name": "etcdPeering3",
+        "name": "vpnPeering3",
         "type": "Microsoft.Resources/deployments",
         "dependsOn": [
             "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
