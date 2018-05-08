@@ -76,14 +76,22 @@
         "metadata": {
             "description" : "The total number of etcd VMs."
         }
+    },
+    "vnetNamePrefix": {
+      "type": "string",
+      "defaultValue": "pgVNet",
+      "metadata": {
+        "description": "the VNetName to use infront of all virtual networks"
+      }     
     }
+    
   },
   "variables": {
     "extensionName": "etcdInstall-ext",
     "nicName": "etcdNic",
-    "vnetName": "etcdVNet",
+    "vnetName": "[parameters('vnetNamePrefix')]",
     "subnetName": "etcdSubnet",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
     "Token": "[guid(subscription().subscriptionId)]",
     "uniqueToken": "[uniqueString( resourceGroup().id, deployment().name, variables('Token'))]"
 
@@ -106,100 +114,6 @@
       "properties": {}
     },
     {
-        "type": "Microsoft.Network/virtualNetworks",
-        "name": "[concat(variables('vnetName'), copyindex())]",
-        "apiVersion": "2016-03-30",
-        "location": "[parameters('etcdSiteLocations')[copyindex()]]",
-        "copy": {
-            "name": "virtualNetworksLoop", 
-            "count": "[parameters('numberOfEtcdInstances')]"
-          },
-        "properties": {
-          "addressSpace": {
-            "addressPrefixes": [
-                "[parameters('etcdRegionSubnet')[copyindex()]]"
-            ]
-          },
-          "dhcpOptions": {
-            "dnsServers": []
-          },
-          "subnets": [
-            {
-              "name": "[variables('subnetName')]",
-              "properties": {
-                "addressPrefix": "[parameters('etcdRegionSubnet')[copyindex()]]"
-              }
-            }
-          ]
-        }
-    },
-    {
-        "apiVersion": "2017-05-10",
-        "name": "etcdPeering1",
-        "type": "Microsoft.Resources/deployments",
-        "dependsOn": [
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"
-        ],
-        "properties": {
-            "mode": "Incremental",
-            "templateLink": {
-              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd-vpn-peering.json",
-              "contentVersion":"1.0.0.0"
-           },
-           "parameters": {
-            "etcdSiteFrom":  {"value": "[parameters('etcdSiteLocations')[0]]"},
-            "etcdSiteTo":  {"value": "[parameters('etcdSiteLocations')[1]]"},
-            "vnetFrom":{"value": "[concat(variables('vnetName'),0)]"},
-            "vnetTo":{"value": "[concat(variables('vnetName'),1)]"}
-            }
-        }
-      },
-      {
-        "apiVersion": "2017-05-10",
-        "name": "etcdPeering2",
-        "type": "Microsoft.Resources/deployments",
-        "dependsOn": [
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"
-        ],
-        "properties": {
-            "mode": "Incremental",
-            "templateLink": {
-              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd-vpn-peering.json",
-              "contentVersion":"1.0.0.0"
-           },
-           "parameters": {
-            "etcdSiteFrom":  {"value": "[parameters('etcdSiteLocations')[1]]"},
-            "etcdSiteTo":  {"value": "[parameters('etcdSiteLocations')[2]]"},
-            "vnetFrom":{"value": "[concat(variables('vnetName'),1)]"},
-            "vnetTo":{"value": "[concat(variables('vnetName'),2)]"}
-            }
-        }
-      },
-      {
-        "apiVersion": "2017-05-10",
-        "name": "etcdPeering3",
-        "type": "Microsoft.Resources/deployments",
-        "dependsOn": [
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"
-        ],
-        "properties": {
-            "mode": "Incremental",
-            "templateLink": {
-              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd-vpn-peering.json",
-              "contentVersion":"1.0.0.0"
-           },
-           "parameters": {
-            "etcdSiteFrom":  {"value": "[parameters('etcdSiteLocations')[2]]"},
-            "etcdSiteTo":  {"value": "[parameters('etcdSiteLocations')[0]]"},
-            "vnetFrom":{"value": "[concat(variables('vnetName'),2)]"},
-            "vnetTo":{"value": "[concat(variables('vnetName'),0)]"}
-            }
-        }
-      },
-    {
         "type": "Microsoft.Network/networkInterfaces",
         "name": "[concat(variables('nicName'), copyindex())]",
         "apiVersion": "2016-03-30",
@@ -208,9 +122,7 @@
             "name": "networkInterfaceLoop", 
             "count": "[parameters('numberOfEtcdInstances')]"
           },
-        "dependsOn": [
-          "[resourceId('Microsoft.Network/virtualNetworks', concat(variables('vnetName'), copyindex()))]"
-        ],
+        "dependsOn": [ ],
         "properties": {
           "ipConfigurations": [
             {
