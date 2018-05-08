@@ -41,9 +41,9 @@
     "etcdRegionSubnet": {
         "type": "array",
         "defaultValue": [
-            "10.10.5.0/24",
-            "10.10.6.0/24",
-            "10.10.7.0/24"
+            "10.10.5.0/22",
+            "10.10.6.0/22",
+            "10.10.7.0/22"
         ],
         "metadata": {
             "description": "Etcd Locations"
