@@ -1,0 +1,202 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageSKU": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ],
+      "defaultValue": "Standard_LRS",
+      "metadata": {
+        "description": "The type of replication to use for the storage account."
+      }
+    },
+    "etcdSiteLocations": {
+        "type": "array",
+        "defaultValue": [
+            "East US",
+            "Central US",
+            "West US"
+        ],
+        "metadata": {
+            "description": "Etcd Locations"
+        }
+    },
+    "etcdRegionIP": {
+        "type": "array",
+        "defaultValue": [
+            "10.10.5.200",
+            "10.10.6.200",
+            "10.10.7.200"
+        ],
+        "metadata": {
+            "description": "Etcd Locations"
+        }
+    },
+    "etcdRegionSubnet": {
+        "type": "array",
+        "defaultValue": [
+            "10.10.5.0/24",
+            "10.10.6.0/24",
+            "10.10.7.0/24"
+        ],
+        "metadata": {
+            "description": "Etcd Locations"
+        }
+    }, 
+    "storageNamePrefix": {
+      "type": "string",
+      "maxLength": 13,
+      "defaultValue": "ha1pg",
+      "metadata": {
+        "description": "The value to use for starting the storage account name. Use only lowercase letters and numbers."
+      }
+    },
+    "adminUsername": {
+        "type": "string",
+        "defaultValue": "azureuser",
+        "metadata": {
+          "description": "Admin username"
+        }
+    },
+    "adminPassword": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Admin password"
+        }
+    },
+    "numberOfEtcdInstances": {
+        "type": "int",
+        "defaultValue": 3,
+        "metadata": {
+            "description" : "The total number of etcd VMs."
+        }
+    }
+  },
+  "variables": {
+    "vnetName": "pgVNet",
+    "subnetName": "pgSubnet",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
+    "Token": "[guid(subscription().subscriptionId)]",
+    "uniqueToken": "[uniqueString( resourceGroup().id, deployment().name, variables('Token'))]"
+
+  },
+  "resources": [
+    {
+      "name": "[concat(parameters('storageNamePrefix'),toLower(replace( parameters('etcdSiteLocations')[copyindex()],' ','')),Substring(variables('uniqueToken'),0,8) )]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "[parameters('storageSKU')]"
+      },
+      "kind": "Storage",
+      "location": "[parameters('etcdSiteLocations')[copyindex()]]",
+      "copy": {
+        "name": "storageLoop", 
+        "count": "[parameters('numberOfEtcdInstances')]"
+      },
+      "tags": {},
+      "properties": {}
+    },
+    {
+        "type": "Microsoft.Network/virtualNetworks",
+        "name": "[concat(variables('vnetName'), copyindex())]",
+        "apiVersion": "2016-03-30",
+        "location": "[parameters('etcdSiteLocations')[copyindex()]]",
+        "copy": {
+            "name": "virtualNetworksLoop", 
+            "count": "[parameters('numberOfEtcdInstances')]"
+          },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+                "[parameters('etcdRegionSubnet')[copyindex()]]"
+            ]
+          },
+          "dhcpOptions": {
+            "dnsServers": []
+          },
+          "subnets": [
+            {
+              "name": "[variables('subnetName')]",
+              "properties": {
+                "addressPrefix": "[parameters('etcdRegionSubnet')[copyindex()]]"
+              }
+            }
+          ]
+        }
+    },
+    {
+        "apiVersion": "2017-05-10",
+        "name": "vpnPeering1",
+        "type": "Microsoft.Resources/deployments",
+        "dependsOn": [
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/networking/vpn-peering.json",
+              "contentVersion":"1.0.0.0"
+           },
+           "parameters": {
+            "etcdSiteFrom":  {"value": "[parameters('etcdSiteLocations')[0]]"},
+            "etcdSiteTo":  {"value": "[parameters('etcdSiteLocations')[1]]"},
+            "vnetFrom":{"value": "[concat(variables('vnetName'),0)]"},
+            "vnetTo":{"value": "[concat(variables('vnetName'),1)]"}
+            }
+        }
+      },
+      {
+        "apiVersion": "2017-05-10",
+        "name": "vpnPeering2",
+        "type": "Microsoft.Resources/deployments",
+        "dependsOn": [
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),1)]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/networking/vpn-peering.json",
+              "contentVersion":"1.0.0.0"
+           },
+           "parameters": {
+            "etcdSiteFrom":  {"value": "[parameters('etcdSiteLocations')[1]]"},
+            "etcdSiteTo":  {"value": "[parameters('etcdSiteLocations')[2]]"},
+            "vnetFrom":{"value": "[concat(variables('vnetName'),1)]"},
+            "vnetTo":{"value": "[concat(variables('vnetName'),2)]"}
+            }
+        }
+      },
+      {
+        "apiVersion": "2017-05-10",
+        "name": "etcdPeering3",
+        "type": "Microsoft.Resources/deployments",
+        "dependsOn": [
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),0)]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'),2)]"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/networking/vpn-peering.json",
+              "contentVersion":"1.0.0.0"
+           },
+           "parameters": {
+            "etcdSiteFrom":  {"value": "[parameters('etcdSiteLocations')[2]]"},
+            "etcdSiteTo":  {"value": "[parameters('etcdSiteLocations')[0]]"},
+            "vnetFrom":{"value": "[concat(variables('vnetName'),2)]"},
+            "vnetTo":{"value": "[concat(variables('vnetName'),0)]"}
+            }
+        }
+      }
+  ],
+  "outputs": {  }
+}
