@@ -70,6 +70,12 @@
           "description": "Admin password"
         }
     },
+    "vnetNamePrefix": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password"
+      }
+  },
     "numberOfEtcdInstances": {
         "type": "int",
         "defaultValue": 3,
@@ -79,7 +85,7 @@
     }
   },
   "variables": {
-    "vnetName": "pgVNet",
+    "vnetName": "[parameter('vnetNamePrefix')]",
     "subnetName": "pgSubnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
     "Token": "[guid(subscription().subscriptionId)]",

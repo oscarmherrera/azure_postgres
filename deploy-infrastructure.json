@@ -45,10 +45,18 @@
       "metadata": {
         "description": "T-shirt size of the PostgreSQL deployment"
       }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "vnet",
+      "metadata": {
+        "description": "Virtual network name"
+      }
     }
   },
   "variables": {
     "sourceBranch": "master",
+    "vnetNamePrefix": "pgVNet",
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/oscarmherrera/azure_postgres/',variables('sourceBranch'),'/')]",
     "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
     "tshirtSizeSmall": {
@@ -126,11 +134,6 @@
     "uniqueToken": "[uniqueString( resourceGroup().id, variables('Token'))]",
     "pgClusterName": "[concat(parameters('pgClusterNamePrefix'),'_',Substring(variables('uniqueToken'),0,8) )]",
     "tshirtSize": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
-    "HATemplateDisabled": "empty-resources.json",    
-    "jumpboxTemplateEnabled": "jumpbox-resources.json",
-    "jumpboxTemplateDisabled": "empty-resources.json",
-    "jumpboxTemplateUrl": "[concat(variables('templateBaseUrl'), variables(concat('jumpboxTemplate',parameters('jumpbox'))))]",
-    "HATemplateUrl": "[concat(variables('templateBaseUrl'), variables(concat('HATemplate',parameters('haConfigured'))))]",
     "osSettings": {
       "scripts": [
         "[concat(variables('templateBaseUrl'), 'install_postgresql.sh')]",
@@ -173,12 +176,13 @@
       "properties": {
           "mode": "Incremental",
           "templateLink": {
-            "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/network/network-setupjson",
+            "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/networking/network-setup.json",
             "contentVersion":"1.0.0.0"
          },
          "parameters": {
             "adminUsername":{"value": "[parameters('adminUsername')]"},
-            "adminPassword":{"value": "[parameters('adminPassword')]"}
+            "adminPassword":{"value": "[parameters('adminPassword')]"},
+            "vnetNamePrefix":{"value": "[variables('vnetNamePrefix)]"}
           }
       }
     },
@@ -197,7 +201,8 @@
          },
          "parameters": {
             "adminUsername":{"value": "[parameters('adminUsername')]"},
-            "adminPassword":{"value": "[parameters('adminPassword')]"}
+            "adminPassword":{"value": "[parameters('adminPassword')]"},
+            "vnetNamePrefix":{"value": "[variables('vnetNamePrefix)]"}
           }
       }
     }
