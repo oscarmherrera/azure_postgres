@@ -133,7 +133,7 @@ logger \"Copied stolonctl to /usr/bin return: $?\"
 chmod +x /usr/bin/stolonctl
 logger \"chmod stolon-sentinel return: $?\"
 
-#/usr/bin/stolonctl --cluster-name ${CLUSTERNAME} --store-backend=etcdv3 --log-level debug init
+#/usr/bin/stolonctl --cluster-name ${CLUSTERNAME} --store-backend=etcdv3 --log-level debug --store-endpoints=10.10.5.200,10.10.6.200,10.10.7.200 init
 #logger \"Initializing stolon cluster with clustername - ${CLUSTERNAME} return: $?\"
 }
 
