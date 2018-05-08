@@ -85,7 +85,7 @@
     }
   },
   "variables": {
-    "vnetName": "[parameter('vnetNamePrefix')]",
+    "vnetName": "[parameters('vnetNamePrefix')]",
     "subnetName": "pgSubnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
     "Token": "[guid(subscription().subscriptionId)]",
