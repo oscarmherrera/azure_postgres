@@ -30,9 +30,9 @@
     "etcdRegionIP": {
         "type": "array",
         "defaultValue": [
-            "10.10.5.100",
-            "10.11.5.100",
-            "10.12.5.100"
+            "10.10.5.200",
+            "10.10.6.200",
+            "10.10.7.200"
         ],
         "metadata": {
             "description": "Etcd Locations"
@@ -42,8 +42,8 @@
         "type": "array",
         "defaultValue": [
             "10.10.5.0/24",
-            "10.11.5.0/24",
-            "10.12.5.0/24"
+            "10.10.6.0/24",
+            "10.10.7.0/24"
         ],
         "metadata": {
             "description": "Etcd Locations"

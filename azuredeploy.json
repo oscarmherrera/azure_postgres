@@ -180,16 +180,16 @@
     },
     "networkSettings": {
       "vnetName": "[parameters('virtualNetworkName')]",
-      "addressPrefix": "10.0.0.0/16",
+      "addressPrefix": "10.10.0.0/21",
       "subnets": {
         "dmz": {
           "name": "dmz",
-          "prefix": "10.0.0.0/24",
+          "prefix": "10.10.0.0/24",
           "vnet": "[parameters('virtualNetworkName')]"
         },
         "data": {
           "name": "data",
-          "prefix": "10.0.10.0/24",
+          "prefix": "10.10.4.0/22",
           "vnet": "[parameters('virtualNetworkName')]"
         }
       }

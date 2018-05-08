@@ -133,8 +133,8 @@ logger \"Copied stolonctl to /usr/bin return: $?\"
 chmod +x /usr/bin/stolonctl
 logger \"chmod stolon-sentinel return: $?\"
 
-/usr/bin/stolonctl --cluster-name ${CLUSTERNAME} --store-backend=etcdv3 init
-logger \"Initializing stolon cluster with clustername - ${CLUSTERNAME} return: $?\"
+#/usr/bin/stolonctl --cluster-name ${CLUSTERNAME} --store-backend=etcdv3 --log-level debug init
+#logger \"Initializing stolon cluster with clustername - ${CLUSTERNAME} return: $?\"
 }
 
 install_postgresql_service() {
@@ -192,7 +192,7 @@ configure_streaming_replication() {
 		echo \"CREATE USER replicator WITH REPLICATION PASSWORD '$PGPASSWORD';\"
 		sudo -u postgres psql -c \"CREATE USER replicator WITH REPLICATION PASSWORD '$PGPASSWORD';\"
 
-		/usr/bin/stolon-sentinel --cluster-name ${CLUSTERNAME} --store-backend=etcdv3
+		#/usr/bin/stolon-sentinel --cluster-name ${CLUSTERNAME} --store-backend=etcdv3
 		logger \"Starting up lead sentinel clustername - ${CLUSTERNAME} return: $?\"
 	fi
 
@@ -259,8 +259,8 @@ configure_streaming_replication() {
 		sudo -u postgres echo \"primary_conninfo = 'host=$MASTERIP port=5432 user=replicator password=$PGPASSWORD'\" >> recovery.conf
 		sudo -u postgres echo \"trigger_file = '/var/lib/postgresql/9.6/main/failover'\" >> recovery.conf
 
-		/usr/bin/stolon-sentinel --cluster-name ${CLUSTERNAME} --store-backend=etcdv3
-		logger \"Starting up standby sentinel clustername - ${CLUSTERNAME} return: $?\"
+		#/usr/bin/stolon-sentinel --cluster-name ${CLUSTERNAME} --store-backend=etcdv3
+		#logger \"Starting up standby sentinel clustername - ${CLUSTERNAME} return: $?\"
 	fi
 	
 	logger \"Done configuring PostgreSQL streaming replication\"
@@ -274,7 +274,8 @@ start_stolon_keeper() {
 		--pg-su-password={$PGPASSWORD} \
 		--pg-repl-username=repluser \
 		--pg-repl-password=${PGPASSWORD} \
-		--pg-listen-address=127.0.0.1
+		--pg-listen-address=127.0.0.1 \
+		--log-level debug &
 		logger \"Starting up stolon keeper  clustername - ${CLUSTERNAME} return: $?\"
 
 }
@@ -290,7 +291,7 @@ setup_datadisks
 
 configure_streaming_replication
 
-start_stolon_keeper
+#start_stolon_keeper
 #service postgresql start
 
 set +x
