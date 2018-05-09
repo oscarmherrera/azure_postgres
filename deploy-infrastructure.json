@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "pgClusterNamePrefix": {
+    "pgClusterName": {
       "type": "string",
       "metadata": {
         "description": "prefix to be given to this cluster of pg servers"
@@ -25,10 +25,8 @@
   "variables": {
     "sourceBranch": "master",
     "vnetNamePrefix": "pgVNet",
-    "Token": "[guid(subscription().subscriptionId)]",
-    "uniqueToken": "[uniqueString( resourceGroup().id, variables('Token'))]",
-    "pgClusterName": "[concat(parameters('pgClusterNamePrefix'),'_',Substring(variables('uniqueToken'),0,8) )]"
-  },
+    "Token": "[guid(subscription().subscriptionId)]"
+   },
   "resources": [
     {
       "apiVersion": "2017-05-10",
@@ -64,7 +62,7 @@
             "adminUsername":{"value": "[parameters('adminUsername')]"},
             "adminPassword":{"value": "[parameters('adminPassword')]"},
             "vnetNamePrefix":{"value": "[variables('vnetNamePrefix')]"},
-            "pgClusterName":{"value": "[variables('pgClusterName')]"}
+            "pgClusterName":{"value": "[parameters('pgClusterName')]"}
           }
       }
     }
