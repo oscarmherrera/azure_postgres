@@ -1,5 +1,5 @@
 {
-  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.xson#",
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "storageSKU": {
@@ -131,7 +131,7 @@
                 "privateIPAddress": "[parameters('etcdRegionIP')[copyindex()]]",
                 "privateIPAllocationMethod": "Static",
                 "subnet": {
-                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(variables('vnetName'),[copyIndex()]), variables('subnetName'))]"
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', [concat(variables('vnetName'),[copyIndex()])], variables('subnetName'))]"
               },
               "primary": true,
               "privateIPAddressVersion": "IPv4"
