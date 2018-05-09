@@ -72,6 +72,13 @@
       "metadata": {
         "description": "the VNetName to use infront of all virtual networks"
       }     
+    },
+    "pgClusterName": {
+      "type": "string",
+      "defaultValue": "pgVNet",
+      "metadata": {
+        "description": "the VNetName to use infront of all virtual networks"
+      }     
     }
     
   },
@@ -214,7 +221,7 @@
           "fileUris": [
             "https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/install_etcd.sh"
           ],
-          "commandToExecute": "[concat('bash install_etcd.sh', ' -n ',copyindex(), ' -1 ', parameters('etcdRegionIP')[0],' -2 ', parameters('etcdRegionIP')[1],' -3 ',parameters('etcdRegionIP')[2],' -k ',variables('Token'))]"
+          "commandToExecute": "[concat('bash install_etcd.sh', ' -n ',copyindex(), ' -1 ', parameters('etcdRegionIP')[0],' -2 ', parameters('etcdRegionIP')[1],' -3 ',parameters('etcdRegionIP')[2],' -k ',parameters('pgClusterName'),'-',variables('Token'))]"
 
         }
       }

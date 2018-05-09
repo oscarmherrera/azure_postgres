@@ -8,18 +8,6 @@
         "description": "prefix to be given to this cluster of pg servers"
       }
     },
-    "storageAccountNamePrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "Unique name of the new storage account that will be created to store virtual machine VHDs"
-      }
-    },
-    "domainName": {
-      "type": "string",
-      "metadata": {
-        "description": "Domain name of the public jumpbox"
-      }
-    },
     "adminUsername": {
       "type": "string",
       "defaultValue": "azureuser",
@@ -32,141 +20,14 @@
       "metadata": {
         "description": "Virtual machine administrator password"
       }
-    },
-    "tshirtSize": {
-      "type": "string",
-      "defaultValue": "Small",
-      "allowedValues": [
-        "Small",
-        "Medium",
-        "Large",
-        "XLarge"
-      ],
-      "metadata": {
-        "description": "T-shirt size of the PostgreSQL deployment"
-      }
-    },
-    "virtualNetworkName": {
-      "type": "string",
-      "defaultValue": "vnet",
-      "metadata": {
-        "description": "Virtual network name"
-      }
     }
   },
   "variables": {
     "sourceBranch": "master",
     "vnetNamePrefix": "pgVNet",
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/oscarmherrera/azure_postgres/',variables('sourceBranch'),'/')]",
-    "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
-    "tshirtSizeSmall": {
-      "vmSize": "Standard_A1",
-      "diskSize": 1023,
-      "vmTemplate": "[concat(variables('templateBaseUrl'), 'database-2disk-resources.json')]",
-      "vmCount": 2,
-      "slaveCount": 1,
-      "storage": {
-        "name": "[parameters('storageAccountNamePrefix')]",
-        "count": 1,
-        "pool": "db",
-        "map": [
-          0,
-          0
-        ],
-        "jumpbox": 0
-      }
-    },
-    "tshirtSizeMedium": {
-      "vmSize": "Standard_A3",
-      "diskSize": 1023,
-      "vmTemplate": "[concat(variables('templateBaseUrl'), 'database-8disk-resources.json')]",
-      "vmCount": 2,
-      "slaveCount": 1,
-      "storage": {
-        "name": "[parameters('storageAccountNamePrefix')]",
-        "count": 2,
-        "pool": "db",
-        "map": [
-          0,
-          1
-        ],
-        "jumpbox": 0
-      }
-    },
-    "tshirtSizeLarge": {
-      "vmSize": "Standard_A4",
-      "diskSize": 1023,
-      "vmTemplate": "[concat(variables('templateBaseUrl'), 'database-16disk-resources.json')]",
-      "vmCount": 3,
-      "slaveCount": 2,
-      "storage": {
-        "name": "[parameters('storageAccountNamePrefix')]",
-        "count": 2,
-        "pool": "db",
-        "map": [
-          0,
-          1,
-          1
-        ],
-        "jumpbox": 0
-      }
-    },
-    "tshirtSizeXLarge": {
-      "vmSize": "Standard_A4",
-      "diskSize": 1023,
-      "vmTemplate": "[concat(variables('templateBaseUrl'), 'database-16disk-resources.json')]",
-      "vmCount": 4,
-      "slaveCount": 3,
-      "storage": {
-        "name": "[parameters('storageAccountNamePrefix')]",
-        "count": 2,
-        "pool": "db",
-        "map": [
-          0,
-          0,
-          1,
-          1
-        ],
-        "jumpbox": 0
-      }
-    },
     "Token": "[guid(subscription().subscriptionId)]",
     "uniqueToken": "[uniqueString( resourceGroup().id, variables('Token'))]",
-    "pgClusterName": "[concat(parameters('pgClusterNamePrefix'),'_',Substring(variables('uniqueToken'),0,8) )]",
-    "tshirtSize": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
-    "osSettings": {
-      "scripts": [
-        "[concat(variables('templateBaseUrl'), 'install_postgresql.sh')]",
-        "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/shared_scripts/ubuntu/vm-disk-utils-0.1.sh"
-      ],
-      "imageReference": {
-        "publisher": "credativ",
-        "offer": "Debian",
-        "sku": "8",
-        "version": "latest"
-      }
-    },
-    "networkSettings": {
-      "vnetName": "[parameters('virtualNetworkName')]",
-      "addressPrefix": "10.10.5.0/22",
-      "subnets": {
-        "dmz": {
-          "name": "dmz",
-          "prefix": "10.10.4.0/24",
-          "vnet": "[parameters('virtualNetworkName')]"
-        },
-        "data": {
-          "name": "data",
-          "prefix": "10.10.6.0/24",
-          "vnet": "[parameters('virtualNetworkName')]"
-        }
-      }
-    },
-    "availabilitySetSettings": {
-      "name": "pgsqlAvailabilitySet",
-      "fdCount": 3,
-      "udCount": 5
-    }
+    "pgClusterName": "[concat(parameters('pgClusterNamePrefix'),'_',Substring(variables('uniqueToken'),0,8) )]"
   },
   "resources": [
     {
@@ -202,7 +63,8 @@
          "parameters": {
             "adminUsername":{"value": "[parameters('adminUsername')]"},
             "adminPassword":{"value": "[parameters('adminPassword')]"},
-            "vnetNamePrefix":{"value": "[variables('vnetNamePrefix')]"}
+            "vnetNamePrefix":{"value": "[variables('vnetNamePrefix')]"},
+            "pgClusterName":{"value": "[variables('pgClusterName')]"}
           }
       }
     }
