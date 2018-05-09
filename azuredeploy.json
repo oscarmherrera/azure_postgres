@@ -76,7 +76,7 @@
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "vnet",
+      "defaultValue": "pgVNet",
       "metadata": {
         "description": "Virtual network name"
       }
@@ -159,7 +159,7 @@
     },
     "Token": "[guid(subscription().subscriptionId)]",
     "uniqueToken": "[uniqueString( resourceGroup().id, variables('Token'))]",
-    "pgClusterName": "[concat(parameters('pgClusterNamePrefix'),'_',Substring(variables('uniqueToken'),0,8) )]",
+    "pgClusterNameGen": "[concat(parameters('pgClusterNamePrefix'),'_',Substring(variables('uniqueToken'),0,8) )]",
     "tshirtSize": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
     "HATemplateDisabled": "empty-resources.json",    
     "jumpboxTemplateEnabled": "jumpbox-resources.json",
@@ -203,17 +203,18 @@
   "resources": [
     {
       "apiVersion": "2017-05-10",
-      "name": "etcd",
+      "name": "pgInfrastructure",
       "type": "Microsoft.Resources/deployments",
       "properties": {
           "mode": "Incremental",
           "templateLink": {
-            "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/etcd/etcd-deploy.json",
+            "uri":"https://raw.githubusercontent.com/oscarmherrera/azure_postgres/master/deploy-infrastructure.json",
             "contentVersion":"1.0.0.0"
          },
          "parameters": {
             "adminUsername":{"value": "[parameters('adminUsername')]"},
-            "adminPassword":{"value": "[parameters('adminPassword')]"}
+            "adminPassword":{"value": "[parameters('adminPassword')]"},
+            "pgClusterName":{"value": "[variables('pgClusterNameGen')]"}
           }
       }
     },
@@ -221,6 +222,9 @@
       "name": "shared",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'pgInfrastructure')]"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -255,7 +259,7 @@
         },
         "parameters": {
           "pgClusterName": {
-            "value": "[variables('pgClusterName')]"
+            "value": "[variables('pgClusterNameGen')]"
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
@@ -310,7 +314,7 @@
         },
         "parameters": {
           "pgClusterName": {
-            "value": "[variables('pgClusterName')]"
+            "value": "[variables('pgClusterNameGen')]"
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
