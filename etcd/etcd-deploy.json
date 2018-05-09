@@ -90,7 +90,7 @@
     "extensionName": "etcdInstall-ext",
     "nicName": "etcdNic",
     "vnetName": "[parameters('vnetNamePrefix')]",
-    "subnetName": "etcdSubnet",
+    "subnetName": "pgSubnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
     "Token": "[guid(subscription().subscriptionId)]",
     "uniqueToken": "[uniqueString( resourceGroup().id, deployment().name, variables('Token'))]"
