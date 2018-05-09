@@ -38,17 +38,6 @@
             "description": "Etcd Locations"
         }
     },
-    "etcdRegionSubnet": {
-        "type": "array",
-        "defaultValue": [
-            "10.10.5.0/24",
-            "10.10.6.0/24",
-            "10.10.7.0/24"
-        ],
-        "metadata": {
-            "description": "Etcd Locations"
-        }
-    }, 
     "storageNamePrefix": {
       "type": "string",
       "maxLength": 13,
@@ -91,7 +80,6 @@
     "nicName": "etcdNic",
     "vnetName": "[parameters('vnetNamePrefix')]",
     "subnetName": "pgSubnet",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
     "Token": "[guid(subscription().subscriptionId)]",
     "uniqueToken": "[uniqueString( resourceGroup().id, deployment().name, variables('Token'))]"
 
