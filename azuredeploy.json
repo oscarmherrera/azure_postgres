@@ -188,9 +188,9 @@
           "vnet": "[parameters('virtualNetworkName')]"
         },
         "data": {
-          "name": "data",
+          "name": "pgSubnet",
           "prefix": "10.10.6.0/24",
-          "vnet": "[parameters('virtualNetworkName')]"
+          "vnet": "[concat(parameters('virtualNetworkName'),1)]"
         }
       }
     },
