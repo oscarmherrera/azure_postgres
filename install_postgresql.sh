@@ -133,8 +133,8 @@ logger \"Copied stolonctl to /usr/bin return: $?\"
 chmod +x /usr/bin/stolonctl
 logger \"chmod stolon-sentinel return: $?\"
 
-#/usr/bin/stolonctl --cluster-name ${CLUSTERNAME} --store-backend=etcdv3 --log-level debug --store-endpoints=10.10.5.200,10.10.6.200,10.10.7.200 init
-#logger \"Initializing stolon cluster with clustername - ${CLUSTERNAME} return: $?\"
+echo "deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
+
 }
 
 install_postgresql_service() {
@@ -149,17 +149,21 @@ install_postgresql_service() {
 	# Install PostgreSQL if it is not yet installed
 	if [ $(dpkg-query -W -f='${Status}' postgresql 2>/dev/null | grep -c \"ok installed\") -eq 0 ];
 	then
+
 		add-apt-repository \"deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main 
 		wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-	  	apt-get -y install postgresql-9.6 postgresql-contrib-9.6 postgresql-client-9.6
+		apt-get update
+
+	  	apt-get -y install postgresql-9.6 
 	fi
 	
 	logger \"Done installing PostgreSQL...\"
+
 }
 
 setup_datadisks() {
 
-	MOUNTPOINT=\"/datadisks/disk1\"
+	MOUNTPOINT=\"/mnt/resource/datadisks/disk1\"
 
 	# Move database files to the striped disk
 	if [ -L /var/lib/postgresql/9.6/main ];
@@ -192,9 +196,9 @@ configure_streaming_replication() {
 		echo \"CREATE USER replicator WITH REPLICATION PASSWORD '$PGPASSWORD';\"
 		sudo -u postgres psql -c \"CREATE USER replicator WITH REPLICATION PASSWORD '$PGPASSWORD';\"
 
-		#/usr/bin/stolon-sentinel --cluster-name ${CLUSTERNAME} --store-backend=etcdv3
+		#export CLUSTERNAME=test01
+		/usr/bin/stolon-sentinel --cluster-name=${CLUSTERNAME} --store-backend=etcdv2 --store-endpoints=http://10.10.6.200:2379 init
 		logger \"Starting up lead sentinel clustername - ${CLUSTERNAME} return: $?\"
-	fi
 
 	# Stop service
 	service postgresql stop
@@ -259,23 +263,28 @@ configure_streaming_replication() {
 		sudo -u postgres echo \"primary_conninfo = 'host=$MASTERIP port=5432 user=replicator password=$PGPASSWORD'\" >> recovery.conf
 		sudo -u postgres echo \"trigger_file = '/var/lib/postgresql/9.6/main/failover'\" >> recovery.conf
 
-		#/usr/bin/stolon-sentinel --cluster-name ${CLUSTERNAME} --store-backend=etcdv3
-		#logger \"Starting up standby sentinel clustername - ${CLUSTERNAME} return: $?\"
+		/usr/bin/stolon-sentinel --cluster-name ${CLUSTERNAME} --store-backend=etcdv2 --store-endpoints=http://10.10.6.200:2379
+		logger \"Starting up standby sentinel clustername - ${CLUSTERNAME} return: $?\"
 	fi
 	
 	logger \"Done configuring PostgreSQL streaming replication\"
 }
 
+init_stolon() {
+	/usr/bin/stolonctl --cluster-name ${CLUSTERNAME} --store-backend etcdv2 --log-level debug --store-endpoints http://10.10.6.200:2379 init
+	logger \"Initializing stolon cluster with clustername - ${CLUSTERNAME} return: $?\"
+}
 start_stolon_keeper() {
-		/usr/bin/stolon-keeper --cluster-name ${CLUSTERNAME} \
-		--store-backend=etcdv3 \
+		/usr/bin/stolon-keeper --cluster-name test01 \
+		--store-backend etcdv2 \
+		--store-endpoints http://10.10.6.200:2379 \
 		--uid postgres \
 		--data-dir /datadisks/disk1/main \
-		--pg-su-password={$PGPASSWORD} \
-		--pg-repl-username=repluser \
-		--pg-repl-password=${PGPASSWORD} \
+		--pg-su-password ${PGPASSWORD} \
+		--pg-repl-username repluser \
+		--pg-repl-password ${PGPASSWORD} \
 		--pg-listen-address=127.0.0.1 \
-		--log-level debug &
+		--log-level info &
 		logger \"Starting up stolon keeper  clustername - ${CLUSTERNAME} return: $?\"
 
 }
@@ -287,11 +296,13 @@ install_postgresql_service
 
 setup_datadisks
 
+init_stolon
+
+start_stolon_keeper
 #service postgresql start
 
 configure_streaming_replication
 
-#start_stolon_keeper
 #service postgresql start
 
 set +x
