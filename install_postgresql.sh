@@ -196,10 +196,6 @@ configure_streaming_replication() {
 		echo \"CREATE USER replicator WITH REPLICATION PASSWORD '$PGPASSWORD';\"
 		sudo -u postgres psql -c \"CREATE USER replicator WITH REPLICATION PASSWORD '$PGPASSWORD';\"
 
-		#export CLUSTERNAME=test01
-		/usr/bin/stolon-sentinel --cluster-name=${CLUSTERNAME} --store-backend=etcdv2 --store-endpoints=http://10.10.6.200:2379 init
-		logger \"Starting up lead sentinel clustername - ${CLUSTERNAME} return: $?\"
-
 	# Stop service
 	service postgresql stop
 
@@ -242,6 +238,9 @@ configure_streaming_replication() {
 		
 		logger \"Updated postgresql.conf\"
 		echo \"Updated postgresql.conf\"
+
+		/usr/bin/stolon-sentinel --cluster-name=${CLUSTERNAME} --store-backend=etcdv2 --store-endpoints=http://10.10.6.200:2379 init
+		logger \"Starting up lead sentinel clustername - ${CLUSTERNAME} return: $?\"
 	fi
 
 	# Synchronize the slave
