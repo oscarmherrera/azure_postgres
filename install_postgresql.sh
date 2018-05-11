@@ -156,7 +156,6 @@ install_postgresql_service() {
 		add-apt-repository \"deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main 
 		wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 		apt-get update
-
 	  	apt-get -y install postgresql-9.6 
 	fi
 	
@@ -198,7 +197,7 @@ configure_streaming_replication() {
 		logger \"Create user replicator...\"
 		echo \"CREATE USER replicator WITH REPLICATION PASSWORD '$PGPASSWORD';\"
 		sudo -u postgres psql -c \"CREATE USER replicator WITH REPLICATION PASSWORD '$PGPASSWORD';\"
-
+	fi
 	# Stop service
 	service postgresql stop
 
@@ -276,8 +275,9 @@ init_stolon() {
 	/usr/bin/stolonctl --cluster-name ${CLUSTERNAME} --store-backend etcdv2 --log-level debug --store-endpoints http://10.10.6.200:2379 init
 	logger \"Initializing stolon cluster with clustername - ${CLUSTERNAME} return: $?\"
 }
+
 start_stolon_keeper() {
-		/usr/bin/stolon-keeper --cluster-name test01 \
+		/usr/bin/stolon-keeper --cluster-name ${CLUSTERNAME} \
 		--store-backend etcdv2 \
 		--store-endpoints http://10.10.6.200:2379 \
 		--uid postgres \
