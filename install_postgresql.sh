@@ -90,6 +90,9 @@ while getopts :m:s:t:p:c: optname; do
 done
 
 export PGPASSWORD=$REPLICATORPASSWORD
+echo 'export PGPASSWORD=$REPLICATORPASSWORD' >> ~/.bash_profile
+echo 'export CLUSTERNAME=$CLUSTERNAME' >> ~/.bash_profile
+
 
 logger \" NOW=$now MASTERIP=$MASTERIP SUBNETADDRESS=$SUBNETADDRESS NODETYPE={$NODETYPE} \"
 
